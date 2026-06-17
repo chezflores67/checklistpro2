@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO26 - Control Operativo Gastronómico</title>
+    <title>PRO26 — Inteligencia Gastronómica</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .tab-content { display: none; }
@@ -20,14 +20,12 @@
 
     <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 id="header-title" class="text-xl font-bold tracking-tight text-slate-900">PRO26 — Inteligencia Operativa</h1>
-            <p class="text-xs text-slate-500 font-medium">Establecimiento Monolítico Local • Base de Datos IndexedDB</p>
+            <h1 id="header-title" class="text-xl font-bold tracking-tight text-slate-900">PRO26 — Sistema Agustín</h1>
+            <p class="text-xs text-slate-500 font-medium">Establecimiento Local Autónomo • Base de Datos IndexedDB</p>
         </div>
-        <div class="flex items-center gap-3">
-            <div class="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                <span>Ciclo: <b id="cycle-start-date" class="text-slate-900">...</b></span>
-            </div>
+        <div class="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>Ciclo: <b id="cycle-start-date" class="text-slate-900">...</b></span>
         </div>
     </header>
 
@@ -45,12 +43,26 @@
                 <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-600">🔒</div>
                 <div>
                     <h3 class="text-base font-bold text-slate-900">Acceso Restringido</h3>
-                    <p class="text-xs text-slate-500">Ingrese el PIN de 4 dígitos para modificar configuraciones.</p>
+                    <p class="text-xs text-slate-500">Ingrese el PIN de 4 dígitos para modificar la configuración.</p>
                 </div>
                 <input type="password" id="pin-input" maxlength="4" placeholder="••••" class="w-24 text-center tracking-widest text-lg font-bold p-2 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:border-slate-900">
                 <div class="flex gap-2 pt-2">
-                    <button onclick="cerrarPinModal(false)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2 rounded-lg font-medium transition">Cancelar</button>
+                    <button onclick="cerrarPinModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2 rounded-lg font-medium transition">Cancelar</button>
                     <button onclick="validarPin()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs py-2 rounded-lg font-medium transition">Ingresar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl shadow-xl border border-slate-200 p-6 max-w-sm w-full space-y-4">
+                <div class="flex items-center gap-3 border-b border-slate-100 pb-2">
+                    <span id="confirm-icon" class="text-lg">❓</span>
+                    <h3 id="confirm-title" class="text-sm font-bold text-slate-900">Confirmar Acción</h3>
+                </div>
+                <p id="confirm-message" class="text-xs text-slate-600 leading-relaxed"></p>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="cerrarConfirmModal(false)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2 rounded-lg font-medium transition">Modificar / Cancelar</button>
+                    <button onclick="cerrarConfirmModal(true)" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs py-2 rounded-lg font-medium transition">Sí, Confirmar</button>
                 </div>
             </div>
         </div>
@@ -93,11 +105,9 @@
                         Fotos de evidencia: <span id="photo-count">0</span> / 3 máx.
                     </div>
                 </div>
-                
                 <div id="tareas-container" class="divide-y divide-slate-100 p-6 space-y-4"></div>
-
                 <div class="p-4 bg-slate-50/50 border-t border-slate-200 flex justify-end">
-                    <button onclick="guardarChecklist()" id="btn-save-checklist" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm">
+                    <button onclick="solicitarConfirmacionOperativo()" id="btn-save-checklist" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm">
                         Enviar a Validación
                     </button>
                 </div>
@@ -120,7 +130,7 @@
 
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 border-b border-slate-200">
-                    <h3 class="text-sm font-bold text-slate-800">Historial de Turnos Validados (Semana Actual)</h3>
+                    <h3 class="text-sm font-bold text-slate-800">Historial de Turnos Validados</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
@@ -155,7 +165,6 @@
                         <p class="text-slate-600">Mapeo de insumos de tus planillas (Negroni Base): 1oz Gin ($0.74), 1oz Vermouth ($0.30), 1oz Campari ($1.14).</p>
                         <p class="font-semibold text-slate-900 pt-1 border-t border-slate-200">Costo Bruto: $2.19 | Precio Sugerido Venta (Margen Objetivo 22%): $9.99</p>
                     </div>
-
                     <div class="space-y-3 pt-2">
                         <h4 class="text-xs font-bold uppercase text-slate-400">Calculadora de Precio por Margen</h4>
                         <div class="grid grid-cols-2 gap-2">
@@ -201,49 +210,76 @@
             </div>
 
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-base font-bold text-slate-900">📍 CRUD: Gestión de Puntos de Inspección por Área</h2>
-                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
+                <h2 class="text-base font-bold text-slate-900">🗂️ CRUD: Control de Áreas Operativas</h2>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nombre de la Nueva Área</label>
+                            <input type="hidden" id="crud-area-idx" value="">
+                            <input type="text" id="crud-area-nombre" placeholder="Ej. Barra de Bebidas" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none">
+                        </div>
+                        <div class="flex items-end pb-2">
+                            <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                                <input type="checkbox" id="crud-area-foto" class="rounded text-slate-950 focus:ring-slate-900">
+                                Exigir Cámara de Evidencia (Máx 3)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button onclick="limpiarFormArea()" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium">Limpiar</button>
+                        <button onclick="guardarAreaOperativa()" class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-xs font-medium">Guardar Área</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto border border-slate-100 rounded-lg">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Nombre del Área</th>
+                                <th class="p-3">Cámara Requerida</th>
+                                <th class="p-3 w-32 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crud-tabla-areas" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-900">📍 CRUD: Catálogo de Tareas Operativas</h2>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Área</label>
-                        <select id="crud-area" class="w-full p-1.5 text-xs bg-white border border-slate-200 rounded focus:outline-none">
-                            <option value="cocina">Cocina</option>
-                            <option value="parrilla">Parrilla FI-FÍ</option>
-                            <option value="meseros">Servicio Meseros</option>
-                            <option value="barra">Barra</option>
-                            <option value="caja">Caja</option>
-                            <option value="salon">Limpieza de Salón</option>
-                            <option value="almacen">Almacén</option>
-                        </select>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Área de Destino</label>
+                        <select id="crud-area" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none"></select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Turno</label>
-                        <select id="crud-turno" class="w-full p-1.5 text-xs bg-white border border-slate-200 rounded focus:outline-none">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Turno Aplicable</label>
+                        <select id="crud-turno" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none">
                             <option value="matutino">Matutino</option>
                             <option value="vespertino">Vespertino</option>
                             <option value="nocturno">Nocturno</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Formato</label>
-                        <select id="crud-tipo" class="w-full p-1.5 text-xs bg-white border border-slate-200 rounded focus:outline-none">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Formato de Lista</label>
+                        <select id="crud-tipo" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none">
                             <option value="apertura">Apertura</option>
                             <option value="cierre">Cierre</option>
                             <option value="express">Express</option>
                         </select>
                     </div>
-                    <button onclick="filtrarCrudTareas()" class="w-full bg-slate-800 hover:bg-slate-700 text-white py-1.5 text-xs font-bold rounded transition">Filtrar Catálogo</button>
+                    <button onclick="filtrarCrudTareas()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 text-xs font-bold rounded-lg transition">Filtrar Tareas</button>
                 </div>
 
                 <div class="space-y-2 border-t border-slate-100 pt-3">
-                    <label class="block text-xs font-bold text-slate-700">Agregar o Editar Punto de Criterio</label>
+                    <label class="block text-xs font-bold text-slate-700">Formulario de Criterio Operativo</label>
                     <div class="flex gap-2">
                         <input type="hidden" id="crud-edit-id" value="">
-                        <input type="text" id="crud-desc-input" placeholder="Escribe la descripción de la tarea operativa..." class="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:outline-none">
-                        <button onclick="guardarPuntoInspeccion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Guardar Punto</button>
+                        <input type="text" id="crud-desc-input" placeholder="Escribe la consigna o tarea para el personal..." class="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:outline-none">
+                        <button onclick="guardarPuntoInspeccion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Guardar Criterio</button>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto border border-slate-100 rounded-lg mt-4">
+                <div class="overflow-x-auto border border-slate-100 rounded-lg">
                     <table class="w-full text-left text-xs text-slate-700">
                         <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold">
                             <tr>
@@ -255,37 +291,21 @@
                     </table>
                 </div>
             </div>
-
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-base font-bold text-slate-900">📸 Configuración de Evidencias</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-500 border-b border-slate-200 font-semibold">
-                                <th class="p-3">Área de Trabajo</th>
-                                <th class="p-3 text-right">Estatus de Cámara</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-areas-config" class="divide-y divide-slate-100 text-slate-700"></tbody>
-                    </table>
-                </div>
-            </div>
         </section>
     </main>
 
     <footer class="bg-white border-t border-slate-200 text-slate-400 text-center py-4 text-[11px] font-medium mt-auto">
-        <p>© 2026 PRO26 — Sistema de Ingeniería Operativa Multiturno Desarrollado para Agustín.</p>
+        <p>© 2026 PRO26 — Ingeniería Gastronómica de Control Local para Agustín.</p>
     </footer>
 
     <script>
         let db;
-        const DB_NAME = "PRO26_DB";
+        const DB_NAME = "PRO26_DB_V2";
         const DB_VERSION = 1;
         let pinAutenticado = false;
+        let callbackConfirmacion = null;
 
-        // CARGA TOTAL DE TUS ARCHIVOS OPERATIVOS INTEGRADA DE FORMA SEMILLA
         let TAREAS_SEMILLA = [
-            // COCINA CIERRE (Archivo: CHECK LIST DE CIERRE DE COCINA.xlsx)
             { id: 1, area: "cocina", desc: "Todos los alimentos quedan bien tapados (refrigeradores, congelador, almacén repisas)", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 2, area: "cocina", desc: "El área de producción queda limpia y desinfectada", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 3, area: "cocina", desc: "Los pisos de toda la cocina quedan limpios, incluyendo detrás de estufas y refrigeradores", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
@@ -305,8 +325,6 @@
             { id: 17, area: "cocina", desc: "Los trapeadores se lavan y quedan limpios después de utilizarlos", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 18, area: "cocina", desc: "Los trapos se dejan remojando en una cubeta con un poco de cloro", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 19, area: "cocina", desc: "Las estufas, parrillas y plancha quedan limpias, sin residuos de comida ni grasa", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
-
-            // PARRILLA FI-FÍ (Archivo: CHECK LIST DE PARRILLA FI-FÍ.xlsx)
             { id: 20, area: "parrilla", desc: "Portar uniforme completo: Filipina roja, playera fifi, pantalón negro, visera con red roja, mandil con logotipo, tenis negros y 3 plumas de click", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 21, area: "parrilla", desc: "Registrar entrada mediante huella digital y realizar lavado de manos riguroso", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 22, area: "parrilla", desc: "Realizar el inventario inicial llenando la sección CONTROL DE PARRILLA", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
@@ -318,13 +336,11 @@
             { id: 28, area: "parrilla", desc: "Dejar las mamilas de salsas en solución profunda con Eurochlor", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 29, area: "parrilla", desc: "Verificar cierre de la llave general de gas y extractor apagado", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 30, area: "parrilla", desc: "Realizar inventario final físico para cuadre del CONTROL DE PARRILLA", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
-
-            // MESEROS SERVICIO (Archivo: check list cursos 2020.docx)
             { id: 31, area: "meseros", desc: "Check de limpieza profunda y carga completa del área de servicio", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 32, area: "meseros", desc: "Saludo y Bienvenida nombrando el negocio y presentación del vendedor", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 33, area: "meseros", desc: "Pregunta rompe hielo, entrega de menú y ofrecimiento activo de promociones", tipos: ["apertura","express"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 34, area: "meseros", desc: "Levantamiento orden de bebidas con técnica de venta sugestiva", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 35, area: "meseros", desc: "Levantamiento orden de alimentos aplicando venta con UPSALE (revisar comanda, tiempos, peticiones)", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 35, area: "meseros", desc: "Levantamiento orden de alimentos aplicando venta con UPSALE", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 36, area: "meseros", desc: "Montaje correcto de mesa: centro de mesa, salsas, cubiertos (orden/posición) y platos", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 37, area: "meseros", desc: "Monitorear tiempos, pregunta de seguimiento '¿Falta algo?' y retiro de muertos continuo", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] }
         ];
@@ -339,9 +355,6 @@
             { id: "almacen", nombre: "Almacén", requiereFoto: false }
         ];
 
-        let fotosCargadasEnChecklistActual = 0;
-        let tabDestinoBloqueado = "";
-
         function initDB() {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
             request.onupgradeneeded = function(e) {
@@ -353,11 +366,11 @@
             };
             request.onsuccess = function(e) {
                 db = e.target.result;
-                sincronizarTareasYConfig();
+                sincronizarBase();
             };
         }
 
-        function sincronizarTareasYConfig() {
+        function sincronizarBase() {
             const tx = db.transaction(["configuracion", "tareas_dinamicas"], "readwrite");
             const configStore = tx.objectStore("configuracion");
             const tareasStore = tx.objectStore("tareas_dinamicas");
@@ -380,9 +393,7 @@
             };
 
             tareasStore.count().onsuccess = function(e) {
-                if (e.target.result === 0) {
-                    TAREAS_SEMILLA.forEach(t => tareasStore.add(t));
-                }
+                if (e.target.result === 0) { TAREAS_SEMILLA.forEach(t => tareasStore.add(t)); }
             };
         }
 
@@ -397,10 +408,36 @@
             }
         }
 
-        // --- SISTEMA DE PIN (4 DÍGITOS PARA AGUSTIN) ---
+        // --- MANEJO DE MODALES DE CONFIRMACIÓN ---
+        function mostrarVentanaConfirmar(title, msg, icon, callback) {
+            document.getElementById("confirm-title").innerText = title;
+            document.getElementById("confirm-message").innerText = msg;
+            document.getElementById("confirm-icon").innerText = icon;
+            document.getElementById("confirm-modal").classList.remove("hidden");
+            callbackConfirmacion = callback;
+        }
+
+        function cerrarConfirmModal(aprobado) {
+            document.getElementById("confirm-modal").classList.add("hidden");
+            if (aprobado && callbackConfirmacion) { callbackConfirmacion(); }
+            callbackConfirmacion = null;
+        }
+
+        function solicitarConfirmacionOperativo() {
+            const empleado = document.getElementById("op-empleado").value.trim();
+            if (!empleado) return alert("Ingrese el nombre del operativo a cargo.");
+            
+            mostrarVentanaConfirmar(
+                "¿Confirmar envío del Formato?",
+                `Hola ${empleado}, se enviarán todas tus respuestas del turno a revisión del supervisor. ¿Deseas continuar?`,
+                "📋",
+                ejecutarGuardadoOperativo
+            );
+        }
+
+        // --- SEGURIDAD: PIN ACCESO ---
         function switchTab(tabId) {
             if (tabId === "tab-admin" && !pinAutenticado) {
-                tabDestinoBloqueado = tabId;
                 document.getElementById("pin-modal").classList.remove("hidden");
                 document.getElementById("pin-input").focus();
                 return;
@@ -409,19 +446,18 @@
         }
 
         function validarPin() {
-            const pin = document.getElementById("pin-input").value;
-            if (pin === "2026") {
+            if (document.getElementById("pin-input").value === "2026") {
                 pinAutenticado = true;
                 document.getElementById("pin-modal").classList.add("hidden");
                 document.getElementById("pin-input").value = "";
-                ejecutarCambioTab(tabDestinoBloqueado || "tab-admin");
+                ejecutarCambioTab("tab-admin");
             } else {
-                alert("PIN incorrecto. Acceso restringido.");
+                alert("PIN incorrecto. Modificaciones denegadas.");
                 document.getElementById("pin-input").value = "";
             }
         }
 
-        function cerrarPinModal(fuerza) {
+        function cerrarPinModal() {
             document.getElementById("pin-modal").classList.add("hidden");
             document.getElementById("pin-input").value = "";
         }
@@ -441,17 +477,24 @@
         }
 
         function inicializarCombosUI() {
-            const selectArea = document.getElementById("op-area");
-            selectArea.innerHTML = "";
+            const selectOp = document.getElementById("op-area");
+            const selectCrud = document.getElementById("crud-area");
+            selectOp.innerHTML = "";
+            selectCrud.innerHTML = "";
+
             areasCatalogo.forEach(a => {
-                let opt = document.createElement("option");
-                opt.value = a.id;
-                opt.innerText = a.nombre;
-                selectArea.appendChild(opt);
+                let opt1 = document.createElement("option");
+                opt1.value = a.id; opt1.innerText = a.nombre;
+                selectOp.appendChild(opt1);
+
+                let opt2 = document.createElement("option");
+                opt2.value = a.id; opt2.innerText = a.nombre;
+                selectCrud.appendChild(opt2);
             });
             actualizarTareasUI();
         }
 
+        // --- FLUJO CAPTURA CHECKLIST ---
         function actualizarTareasUI() {
             const areaSel = document.getElementById("op-area").value;
             const turnoSel = document.getElementById("op-turno").value;
@@ -473,9 +516,9 @@
                 if (cursor) {
                     const t = cursor.value;
                     if (t.area === areaSel && t.tipos.includes(tipoSel) && t.turnos.includes(turnoSel)) {
-                        let itemDiv = document.createElement("div");
-                        itemDiv.className = "py-4 flex flex-col gap-3";
-                        itemDiv.innerHTML = `
+                        let div = document.createElement("div");
+                        div.className = "py-4 flex flex-col gap-3";
+                        div.innerHTML = `
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <p class="text-xs font-medium text-slate-700 max-w-2xl">${t.desc}</p>
                                 <div class="flex items-center gap-3">
@@ -492,22 +535,22 @@
                             <div id="block-violacion-${t.id}" class="hidden bg-rose-50/50 p-4 rounded-lg border border-rose-100 space-y-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-[10px] font-bold text-rose-700 uppercase mb-1">Descripción de Violación</label>
+                                        <label class="block text-[10px] font-bold text-rose-700 uppercase mb-1">Descripción de Violación *</label>
                                         <input type="text" id="input-violacion-${t.id}" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none" placeholder="Falla detectada...">
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Acción Correctiva (Qué hacer)</label>
+                                        <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Acción Correctiva (Qué hacer) *</label>
                                         <input type="text" id="input-correccion-${t.id}" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none" placeholder="Corrección aplicada...">
                                     </div>
                                 </div>
                                 ${requiereFoto ? `
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cargar Foto de Evidencia</label>
-                                    <input type="file" accept="image/*" id="foto-${t.id}" onchange="procesarFotoBase64(${t.id})" class="text-xs text-slate-500 file:mr-4 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-900 file:text-white hover:file:bg-slate-800">
+                                    <input type="file" accept="image/*" id="foto-${t.id}" onchange="procesarFotoBase64(${t.id})" class="text-xs text-slate-500">
                                     <input type="hidden" id="hidden-b64-${t.id}">
                                 </div>` : ''}
                             </div>`;
-                        contenedor.appendChild(itemDiv);
+                        contenedor.appendChild(div);
                     }
                     cursor.continue();
                 }
@@ -531,9 +574,8 @@
         function procesarFotoBase64(id) {
             const fileInput = document.getElementById(`foto-${id}`);
             if (fotosCargadasEnChecklistActual >= 3) {
-                alert("Límite estratégico: Máximo 3 fotos globales por formato.");
-                fileInput.value = "";
-                return;
+                alert("Límite estratégico: Máximo 3 fotos por lista.");
+                fileInput.value = ""; return;
             }
             const file = fileInput.files[0];
             if (file) {
@@ -552,10 +594,8 @@
             if (el) el.innerText = fotosCargadasEnChecklistActual;
         }
 
-        function guardarChecklist() {
+        function ejecutarGuardadoOperativo() {
             const empleado = document.getElementById("op-empleado").value.trim();
-            if (!empleado) return alert("Ingrese el nombre del operativo a cargo.");
-
             const areaSel = document.getElementById("op-area").value;
             const turnoSel = document.getElementById("op-turno").value;
             const tipoSel = document.getElementById("op-tipo").value;
@@ -576,10 +616,8 @@
                             const violacion = document.getElementById(`input-violacion-${t.id}`).value.trim();
                             const correccion = document.getElementById(`input-correccion-${t.id}`).value.trim();
                             if (!violacion || !correccion) validacionCorrecta = false;
-                            
                             respObj.violacion = violacion;
                             respObj.correccion = correccion;
-
                             const fInput = document.getElementById(`hidden-b64-${t.id}`);
                             if (fInput && fInput.value) respObj.foto = fInput.value;
                         }
@@ -587,7 +625,7 @@
                     }
                     cursor.continue();
                 } else {
-                    if (!validacionCorrecta) return alert("Complete los campos de Violación y Acción Correctiva.");
+                    if (!validacionCorrecta) return alert("Error: Si reporta una violación, debe completar obligatoriamente la causa y su acción correctiva.");
 
                     const nuevoFormato = {
                         fecha: new Date().toISOString().split('T')[0],
@@ -603,7 +641,7 @@
 
                     const txSave = db.transaction(["checklists"], "readwrite");
                     txSave.objectStore("checklists").add(nuevoFormato).onsuccess = function() {
-                        alert("✅ Formato registrado. En espera de firma del supervisor.");
+                        alert("✅ Formato guardado de forma segura y enviado a supervisión.");
                         document.getElementById("op-empleado").value = "";
                         actualizarTareasUI();
                     };
@@ -611,12 +649,11 @@
             };
         }
 
-        // --- INTERFAZ PANEL SUPERVISOR CON AUTORIZACIÓN AL INICIO ---
+        // --- PANEL DE SUPERVISOR CON CONFIRMACIÓN ---
         function renderizarSupervisor() {
             const divPendientes = document.getElementById("lista-pendientes");
             const tablaHistorial = document.getElementById("tabla-historial");
-            divPendientes.innerHTML = "";
-            tablaHistorial.innerHTML = "";
+            divPendientes.innerHTML = ""; tablaHistorial.innerHTML = "";
 
             const tx = db.transaction(["checklists"], "readonly");
             tx.objectStore("checklists").openCursor().onsuccess = function(e) {
@@ -633,40 +670,48 @@
                                 <div>
                                     <span class="text-[10px] uppercase font-bold tracking-wider bg-slate-100 text-slate-800 px-2 py-0.5 rounded-md">${item.turno} / ${item.tipo}</span>
                                     <h4 class="font-bold text-slate-900 text-sm mt-1.5 capitalize">Área: ${item.area}</h4>
-                                    <p class="text-[11px] text-slate-500">Operador: <b>${item.empleado}</b> • Generado: ${item.hora} hrs</p>
+                                    <p class="text-[11px] text-slate-500">Operador: <b>${item.empleado}</b> • Hora: ${item.hora}</p>
                                 </div>
                                 <span class="text-xs font-semibold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md">${vCount} Incidencias</span>
                             </div>
                             <div class="text-xs space-y-2 text-slate-600">
                                 ${item.respuestas.map(r => `
                                     <p>• <b>${r.desc}</b><br>
-                                    ${r.cumple ? '<span class="text-emerald-600 font-medium">🟢 Conforme</span>' : `<span class="text-rose-600 font-medium">🔴 Falla: ${r.violacion}</span> | <span class="text-slate-800 font-medium">Solución: ${r.correccion}</span>`}
-                                    ${r.foto ? `<span class="text-blue-500 block italic text-[10px]">[Foto Guardada en IndexedDB]</span>` : ''}</p>
+                                    ${r.cumple ? '<span class="text-emerald-600 font-medium">Conforme</span>' : `<span class="text-rose-600 font-medium">🔴 Violación: ${r.violacion}</span> | <span class="text-slate-800 font-medium">Acción: ${r.correccion}</span>`}</p>
                                 `).join('')}
                             </div>
                             <div class="pt-3 border-t border-slate-100 flex justify-end">
-                                <button onclick="autorizarFormatoRapido(${cursor.key})" class="bg-slate-950 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-bold transition">Firma Autorización Rápida</button>
+                                <button onclick="solicitarConfirmacionSupervisor(${cursor.key})" class="bg-slate-950 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-bold transition">Firma Autorización Rápida</button>
                             </div>`;
                         divPendientes.appendChild(card);
                     } else {
                         let tr = document.createElement("tr");
                         tr.className = "border-b border-slate-100 hover:bg-slate-50/50";
-                        tr.innerHTML = `<td class="p-4">${item.fecha} a las ${item.hora}</td><td class="p-4 font-bold capitalize">${item.area}</td><td class="p-4 capitalize">${item.turno} (${item.tipo})</td><td class="p-4">Op: ${item.empleado}<br><span class="text-slate-400 font-medium text-[10px]">Supervisor: ${item.supervisor}</span></td><td class="p-4 text-right text-emerald-600 font-bold">✓ Archivado</td>`;
+                        tr.innerHTML = `<td class="p-4">${item.fecha} a las ${item.hora}</td><td class="p-4 font-bold capitalize">${item.area}</td><td class="p-4 capitalize">${item.turno} (${item.tipo})</td><td class="p-4">Op: ${item.empleado}<br><span class="text-slate-400 font-medium text-[10px]">Sup: ${item.supervisor}</span></td><td class="p-4 text-right text-emerald-600 font-bold">✓ Archivado</td>`;
                         tablaHistorial.appendChild(tr);
                     }
                     cursor.continue();
                 } else {
                     if (divPendientes.innerHTML === "") {
-                        divPendientes.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center bg-white rounded-xl border border-dashed border-slate-200">No hay formatos pendientes de revisión.</p>`;
+                        divPendientes.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center bg-white rounded-xl border border-dashed border-slate-200">No hay formatos pendientes por firmar.</p>`;
                     }
                 }
             };
         }
 
-        function autorizarFormatoRapido(id) {
+        function solicitarConfirmacionSupervisor(id) {
             const supervisor = document.getElementById("supervisor-signature").value.trim();
-            if (!supervisor) return alert("Por favor escribe tu nombre como Supervisor al inicio de la página para poder firmar.");
+            if (!supervisor) return alert("Debe estipular el nombre del supervisor al inicio del panel antes de firmar.");
+            
+            mostrarVentanaConfirmar(
+                "¿Autorizar Cierre de Formato?",
+                `Estimado ${supervisor}, ¿estás de acuerdo con cerrar este reporte y archivarlo en la auditoría semanal?`,
+                "🛡️",
+                () => ejecutarAutorizacionSupervisor(id, supervisor)
+            );
+        }
 
+        function ejecutarAutorizacionSupervisor(id, supervisor) {
             const tx = db.transaction(["checklists"], "readwrite");
             const store = tx.objectStore("checklists");
             store.get(id).onsuccess = function(e) {
@@ -679,15 +724,63 @@
             };
         }
 
-        // --- CRUD DE PUNTOS DE INSPECCIÓN (ADMINISTRATIVO PROTEGIDO) ---
-        let listaCrudTareas = [];
+        // --- CRUD DE ÁREAS OPERATIVAS (AJUSTABLE POR EL CLIENTE) ---
+        function guardarAreaOperativa() {
+            const nombre = document.getElementById("crud-area-nombre").value.trim();
+            if (!nombre) return alert("Escribe el nombre del área.");
+            const requiereFoto = document.getElementById("crud-area-foto").checked;
+            const idxStr = document.getElementById("crud-area-idx").value;
+
+            if (idxStr !== "") {
+                // Editar Área
+                const index = parseInt(idxStr);
+                areasCatalogo[index].nombre = nombre;
+                areasCatalogo[index].requiereFoto = requiereFoto;
+            } else {
+                // Nueva Área
+                const idGenerado = nombre.toLowerCase().replace(/[^a-z0-9]/g, "_");
+                if (areasCatalogo.some(a => a.id === idGenerado)) return alert("Ese nombre de área ya existe.");
+                areasCatalogo.push({ id: idGenerado, nombre, requiereFoto });
+            }
+
+            const tx = db.transaction(["configuracion"], "readwrite");
+            tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }).onsuccess = function() {
+                alert("Área operativa guardada.");
+                limpiarFormArea();
+                renderizarAdminConfig();
+                inicializarCombosUI();
+            };
+        }
+
+        function eliminarAreaOperativa(index) {
+            if (!confirm(`¿Estás seguro de eliminar el área "${areasCatalogo[index].nombre}"? Se perderán sus filtros del catálogo.`)) return;
+            areasCatalogo.splice(index, 1);
+            const tx = db.transaction(["configuracion"], "readwrite");
+            tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }).onsuccess = function() {
+                renderizarAdminConfig();
+                inicializarCombosUI();
+            };
+        }
+
+        function cargarEditarArea(index) {
+            document.getElementById("crud-area-idx").value = index;
+            document.getElementById("crud-area-nombre").value = areasCatalogo[index].nombre;
+            document.getElementById("crud-area-foto").checked = areasCatalogo[index].requiereFoto;
+        }
+
+        function limpiarFormArea() {
+            document.getElementById("crud-area-idx").value = "";
+            document.getElementById("crud-area-nombre").value = "";
+            document.getElementById("crud-area-foto").checked = false;
+        }
+
+        // --- CRUD ORDENADO DE TAREAS Y FILTROS ---
         function filtrarCrudTareas() {
             const area = document.getElementById("crud-area").value;
             const turno = document.getElementById("crud-turno").value;
             const tipo = document.getElementById("crud-tipo").value;
             const tbody = document.getElementById("crud-tabla-tareas");
             tbody.innerHTML = "";
-            listaCrudTareas = [];
 
             const tx = db.transaction(["tareas_dinamicas"], "readonly");
             tx.objectStore("tareas_dinamicas").openCursor().onsuccess = function(e) {
@@ -695,21 +788,20 @@
                 if (cursor) {
                     const t = cursor.value;
                     if (t.area === area && t.turnos.includes(turno) && t.tipos.includes(tipo)) {
-                        listaCrudTareas.push(t);
                         let tr = document.createElement("tr");
                         tr.className = "border-b border-slate-100 hover:bg-slate-50";
                         tr.innerHTML = `
                             <td class="p-3 text-slate-700 font-medium">${t.desc}</td>
                             <td class="p-3 text-center flex gap-1 justify-center">
-                                <button onclick="cargarEditarTarea(${t.id}, '${t.desc}')" class="bg-slate-200 text-slate-800 px-2 py-1 rounded text-[11px] font-bold">Editar</button>
-                                <button onclick="eliminarTareaCrud(${t.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[11px] font-bold">Eliminar</button>
+                                <button onclick="cargarEditarTarea(${t.id}, '${t.desc}')" class="bg-slate-200 text-slate-800 px-2.5 py-1 rounded-md text-[11px] font-bold">Editar</button>
+                                <button onclick="eliminarTareaCrud(${t.id})" class="bg-rose-600 text-white px-2.5 py-1 rounded-md text-[11px] font-bold">Eliminar</button>
                             </td>`;
                         tbody.appendChild(tr);
                     }
                     cursor.continue();
                 } else {
                     if (tbody.innerHTML === "") {
-                        tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-slate-400 italic">No hay criterios para este filtro.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-slate-400 italic">No hay criterios asignados para este filtro. Puedes agregar uno nuevo abajo.</td></tr>`;
                     }
                 }
             };
@@ -722,7 +814,7 @@
 
         function guardarPuntoInspeccion() {
             const desc = document.getElementById("crud-desc-input").value.trim();
-            if (!desc) return alert("Escribe la descripción de la tarea.");
+            if (!desc) return alert("Escribe la descripción de la consigna.");
 
             const id = document.getElementById("crud-edit-id").value;
             const area = document.getElementById("crud-area").value;
@@ -733,62 +825,53 @@
             const store = tx.objectStore("tareas_dinamicas");
 
             if (id) {
-                // Modo Edición
                 store.get(parseInt(id)).onsuccess = function(e) {
                     let data = e.target.result;
                     data.desc = desc;
                     store.put(data).onsuccess = function() {
-                        limpiarFormCrud();
-                        filtrarCrudTareas();
-                        actualizarTareasUI();
+                        document.getElementById("crud-edit-id").value = "";
+                        document.getElementById("crud-desc-input").value = "";
+                        filtrarCrudTareas(); actualizarTareasUI();
                     };
                 };
             } else {
-                // Modo Nuevo
                 const nuevaTarea = { area, desc, tipos: [tipo], turnos: [turno] };
                 store.add(nuevaTarea).onsuccess = function() {
-                    limpiarFormCrud();
-                    filtrarCrudTareas();
-                    actualizarTareasUI();
+                    document.getElementById("crud-desc-input").value = "";
+                    filtrarCrudTareas(); actualizarTareasUI();
                 };
             }
         }
 
         function eliminarTareaCrud(id) {
-            if (!confirm("¿Deseas eliminar este criterio del catálogo operativo?")) return;
+            if (!confirm("¿Deseas remover este criterio operativo del sistema?")) return;
             const tx = db.transaction(["tareas_dinamicas"], "readwrite");
             tx.objectStore("tareas_dinamicas").delete(id).onsuccess = function() {
-                filtrarCrudTareas();
-                actualizarTareasUI();
+                filtrarCrudTareas(); actualizarTareasUI();
             };
-        }
-
-        function limpiarFormCrud() {
-            document.getElementById("crud-edit-id").value = "";
-            document.getElementById("crud-desc-input").value = "";
         }
 
         function renderizarAdminConfig() {
             document.getElementById("cfg-restaurante").value = localStorage.getItem("restaurante_nombre") || "Tacos y Montados FI-FÍ";
             document.getElementById("cfg-sucursal").value = localStorage.getItem("restaurante_sucursal") || "Matriz LocalStore";
 
-            const tbody = document.getElementById("tabla-areas-config");
-            tbody.innerHTML = "";
-            areasCatalogo.forEach((a, idx) => {
+            // Listar tabla CRUD de Áreas
+            const tbodyAreas = document.getElementById("crud-tabla-areas");
+            tbodyAreas.innerHTML = "";
+            areasCatalogo.forEach((a, index) => {
                 let tr = document.createElement("tr");
-                tr.className = "border-b border-slate-100";
-                tr.innerHTML = `<td class="p-3 font-semibold text-slate-800 capitalize">${a.nombre}</td><td class="p-3 text-right"><input type="checkbox" ${a.requiereFoto ? 'checked' : ''} onchange="cambiarFotoConfig(${idx}, this.checked)" class="rounded border-slate-300 text-slate-900 focus:ring-slate-900"> Habilitada</td>`;
-                tbody.appendChild(tr);
+                tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-800">${a.nombre}</td>
+                    <td class="p-3 font-medium ${a.requiereFoto ? 'text-amber-600' : 'text-slate-400'}">${a.requiereFoto ? '📸 Activa' : 'Desactivada'}</td>
+                    <td class="p-3 text-center flex gap-1 justify-center">
+                        <button onclick="cargarEditarArea(${index})" class="bg-slate-200 text-slate-800 px-2 py-1 rounded text-[11px] font-bold">Editar</button>
+                        <button onclick="eliminarAreaOperativa(${index})" class="bg-rose-600 text-white px-2 py-1 rounded text-[11px] font-bold">Borrar</button>
+                    </td>`;
+                tbodyAreas.appendChild(tr);
             });
-            filtrarCrudTareas();
-        }
 
-        function cambiarFotoConfig(idx, checked) {
-            areasCatalogo[idx].requiereFoto = checked;
-            const tx = db.transaction(["configuracion"], "readwrite");
-            tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }).onsuccess = function() {
-                inicializarCombosUI();
-            };
+            filtrarCrudTareas();
         }
 
         function guardarConfigSucursal() {
@@ -797,10 +880,10 @@
             localStorage.setItem("restaurante_nombre", nom);
             localStorage.setItem("restaurante_sucursal", suc);
             document.getElementById("header-title").innerText = nom + " — " + suc;
-            alert("Unidad de negocio guardada localmente.");
+            alert("Establecimiento guardado.");
         }
 
-        // --- EXPORTACIÓN Y REINICIO OBLIGATORIO ---
+        // --- RESPALDOS SEMANALES ---
         function downloadPDFAndReset() {
             const tx = db.transaction(["checklists"], "readonly");
             let logs = [];
@@ -812,9 +895,7 @@
                     const a = document.createElement('a');
                     a.setAttribute("href", str);
                     a.setAttribute("download", `PRO26_AUDITORIA_AGUSTIN_${new Date().toISOString().split('T')[0]}.json`);
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
+                    document.body.appendChild(a); a.click(); a.remove();
                     ejecutarLimpiezaCiclo();
                 }
             };
@@ -825,18 +906,17 @@
             tx.objectStore("checklists").clear();
             const hoy = new Date().toISOString().split('T')[0];
             tx.objectStore("configuracion").put({ id: "ciclo_inicio", fecha: hoy }).onsuccess = function() {
-                alert("🚨 El sistema se ha reiniciado correctamente para la nueva semana de operaciones.");
+                alert("🚨 Base limpia para el inicio del nuevo ciclo.");
                 location.reload();
             };
         }
 
-        // --- MÓDULO DE COSTOS ---
+        // --- FINANZAS ---
         function calcularPrecioSugerido() {
             const cost = parseFloat(document.getElementById("calc-costo").value);
             const pct = parseFloat(document.getElementById("calc-pct").value);
-            if (cost && pct) {
-                document.getElementById("calc-resultado").innerText = `Precio de Venta Sugerido: $${(cost / pct).toFixed(2)}`;
-            } else { document.getElementById("calc-resultado").innerText = "Valores inválidos."; }
+            if (cost && pct) { document.getElementById("calc-resultado").innerText = `Precio Sugerido: $${(cost / pct).toFixed(2)}`; }
+            else { document.getElementById("calc-resultado").innerText = "Valores inválidos."; }
         }
 
         function agregarMermaLocal() {
@@ -844,7 +924,7 @@
             const costo = parseFloat(document.getElementById("merma-costo").value);
             const motivo = document.getElementById("merma-motivo").value.trim();
 
-            if (!insumo || isNaN(costo)) return alert("Rellene los campos de la merma económica.");
+            if (!insumo || isNaN(costo)) return alert("Rellene los campos de la merma.");
 
             const nMerma = { insumo, costo, motivo, fecha: new Date().toISOString().split('T')[0] };
             const tx = db.transaction(["mermas"], "readwrite");
@@ -857,8 +937,7 @@
         }
 
         function renderizarMermas() {
-            const lista = document.getElementById("lista-mermas");
-            lista.innerHTML = "";
+            const lista = document.getElementById("lista-mermas"); lista.innerHTML = "";
             const tx = db.transaction(["mermas"], "readonly");
             tx.objectStore("mermas").openCursor().onsuccess = function(e) {
                 let cursor = e.target.result;
@@ -866,8 +945,7 @@
                     let li = document.createElement("li");
                     li.className = "bg-slate-50 p-2.5 rounded-lg border-l-4 border-rose-500 font-medium text-slate-700 flex justify-between";
                     li.innerHTML = `<span>📅 ${cursor.value.fecha} — <b>${cursor.value.insumo}</b> (${cursor.value.motivo})</span> <span class="text-rose-600">-$${cursor.value.costo}</span>`;
-                    lista.appendChild(li);
-                    cursor.continue();
+                    lista.appendChild(li); cursor.continue();
                 }
             };
         }
