@@ -3,197 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Checklists Profesional - Restaurante</title>
+    <title>PRO26 - Control Operativo Gastronómico</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        body { background-color: #f8fafc; color: #0f172a; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col font-sans">
 
-    <div id="weekly-lock-banner" class="hidden bg-red-600 text-white p-4 text-center font-bold sticky top-0 z-50 animate-pulse shadow-lg">
-        ⚠️ EL CICLO SEMANAL HA CONCLUIDO. La aplicación está bloqueada. Descarga el reporte PDF para reiniciar el sistema.
-        <button onclick="downloadPDFAndReset()" class="ml-4 bg-white text-red-700 px-4 py-1 rounded hover:bg-gray-100 transition">Descargar PDF y Resetear</button>
+    <div id="weekly-lock-banner" class="hidden bg-slate-900 text-white p-4 text-center text-sm font-medium sticky top-0 z-50 border-b border-rose-500/30 shadow-sm">
+        <span>⚠️ Ciclo semanal concluido. Capturas pausadas hasta descargar el respaldo de auditoría.</span>
+        <button onclick="downloadPDFAndReset()" class="ml-4 bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded transition font-bold tracking-wide uppercase">Descargar y Reiniciar</button>
     </div>
 
-    <header class="bg-slate-800 text-white p-4 shadow-md flex justify-between items-center">
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 id="header-title" class="text-xl font-bold">Control Gastronómico Local</h1>
-            <p class="text-xs text-gray-400">Modo Local Store Activo (IndexedDB)</p>
+            <h1 id="header-title" class="text-xl font-bold tracking-tight text-slate-900">PRO26 — Inteligencia Operativa</h1>
+            <p class="text-xs text-slate-500 font-medium">Establecimiento Monolítico Local • Base de Datos IndexedDB</p>
         </div>
-        <div class="flex items-center space-x-2 bg-slate-700 px-3 py-1.5 rounded text-sm">
-            <span>📅 Ciclo iniciado:</span>
-            <span id="cycle-start-date" class="font-semibold text-green-400">Cargando...</span>
+        <div class="flex items-center gap-3">
+            <div class="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>Ciclo: <b id="cycle-start-date" class="text-slate-900">...</b></span>
+            </div>
         </div>
     </header>
 
-    <nav class="bg-white border-b border-gray-200 flex overflow-x-auto">
-        <button onclick="switchTab('tab-checklist')" class="tab-btn px-6 py-3 font-semibold text-sm border-b-2 border-blue-600 text-blue-600 whitespace-nowrap" id="btn-tab-checklist">📋 Levantar Checklist</button>
-        <button onclick="switchTab('tab-supervisor')" class="tab-btn px-6 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-600 hover:text-blue-600 whitespace-nowrap" id="btn-tab-supervisor">🛡️ Supervisor</button>
-        <button onclick="switchTab('tab-admin')" class="tab-btn px-6 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-600 hover:text-blue-600 whitespace-nowrap" id="btn-tab-admin">⚙️ Configuración</button>
-        <button onclick="switchTab('tab-finanzas')" class="tab-btn px-6 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-600 hover:text-blue-600 whitespace-nowrap" id="btn-tab-finanzas">💰 Finanzas y Recetas</button>
+    <nav class="bg-white border-b border-slate-200 flex px-4 overflow-x-auto gap-2">
+        <button onclick="switchTab('tab-checklist')" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-slate-900 text-slate-900 whitespace-nowrap transition-all" id="btn-tab-checklist">Formularios de Turno</button>
+        <button onclick="switchTab('tab-supervisor')" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition-all" id="btn-tab-supervisor">Panel de Supervisión</button>
+        <button onclick="switchTab('tab-finanzas')" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition-all" id="btn-tab-finanzas">Costos y Mermas</button>
+        <button onclick="switchTab('tab-admin')" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap transition-all" id="btn-tab-admin">Configuración General</button>
     </nav>
 
-    <main class="flex-1 p-4 max-w-5xl w-full mx-auto">
+    <main class="flex-1 p-4 md:p-6 max-w-6xl w-full mx-auto space-y-6">
+
+        <div id="pin-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl shadow-xl border border-slate-200 p-6 max-w-sm w-full text-center space-y-4">
+                <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-600">🔒</div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Acceso Restringido</h3>
+                    <p class="text-xs text-slate-500">Ingrese el PIN de 4 dígitos para modificar configuraciones.</p>
+                </div>
+                <input type="password" id="pin-input" maxlength="4" placeholder="••••" class="w-24 text-center tracking-widest text-lg font-bold p-2 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:border-slate-900">
+                <div class="flex gap-2 pt-2">
+                    <button onclick="cerrarPinModal(false)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2 rounded-lg font-medium transition">Cancelar</button>
+                    <button onclick="validarPin()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs py-2 rounded-lg font-medium transition">Ingresar</button>
+                </div>
+            </div>
+        </div>
 
         <section id="tab-checklist" class="tab-content active space-y-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 border-b pb-2 text-slate-700">📋 Formulario de Turno y Operación</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-900 tracking-tight">📋 Datos de Apertura y Turno</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-sm font-medium mb-1">Turno de Trabajo *</label>
-                        <select id="op-turno" class="w-full p-2 border rounded bg-white" onchange="actualizarTareasUI()">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Turno Laboral</label>
+                        <select id="op-turno" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()">
                             <option value="matutino">☀️ Matutino</option>
                             <option value="vespertino">⛅ Vespertino</option>
-                            <option value="nocturno">🌙 Nocturno (24 hrs)</option>
+                            <option value="nocturno">🌙 Nocturno (24 Hrs)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">Área / Sección *</label>
-                        <select id="op-area" class="w-full p-2 border rounded bg-white" onchange="actualizarTareasUI()"></select>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Área Operativa</label>
+                        <select id="op-area" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()"></select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">Tipo de Checklist *</label>
-                        <select id="op-tipo" class="w-full p-2 border rounded bg-white" onchange="actualizarTareasUI()">
-                            <option value="apertura">🟢 Apertura de Turno</option>
-                            <option value="cierre">🔴 Cierre de Turno</option>
-                            <option value="express">⚡ Express (Falta de tiempo)</option>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Tipo de Formato</label>
+                        <select id="op-tipo" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()">
+                            <option value="apertura">Apertura / Inicio</option>
+                            <option value="cierre">Cierre / Entrega</option>
+                            <option value="express">Falta de tiempo (Express)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">Nombre del Operativo *</label>
-                        <input type="text" id="op-empleado" class="w-full p-2 border rounded" placeholder="Ej. Juan Parrilla">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre del Operativo</label>
+                        <input type="text" id="op-empleado" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" placeholder="Ej. Juan Parrilla">
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h3 class="text-lg font-bold text-slate-700">Puntos a Evaluar</h3>
-                    <div id="photo-counter-badge" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">
-                        Fotos capturadas: <span id="photo-count">0</span> / 3 máx.
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 bg-slate-50/50 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-slate-800">Criterios de Verificación</h3>
+                    <div id="photo-counter-badge" class="hidden text-[11px] bg-slate-900 text-white font-medium px-2.5 py-1 rounded-md">
+                        Fotos de evidencia: <span id="photo-count">0</span> / 3 máx.
                     </div>
                 </div>
-                <div id="tareas-container" class="space-y-4 divide-y divide-gray-100"></div>
-                <div class="mt-6 pt-4 border-t flex justify-end">
-                    <button onclick="guardarChecklist()" id="btn-save-checklist" class="bg-blue-600 text-white px-6 py-2.5 rounded shadow hover:bg-blue-700 font-medium transition">Enviar a Revisión de Supervisor</button>
+                
+                <div id="tareas-container" class="divide-y divide-slate-100 p-6 space-y-4"></div>
+
+                <div class="p-4 bg-slate-50/50 border-t border-slate-200 flex justify-end">
+                    <button onclick="guardarChecklist()" id="btn-save-checklist" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm">
+                        Enviar a Validación
+                    </button>
                 </div>
             </div>
         </section>
 
         <section id="tab-supervisor" class="tab-content space-y-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="text-lg font-bold mb-2 text-slate-700">🛡️ Checklists Pendientes de Validación</h2>
-                <div id="lista-pendientes" class="space-y-4"></div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="text-lg font-bold mb-2 text-slate-700">📚 Historial Semanal (Aprobados)</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-gray-50 border-b">
-                                <th class="p-3 font-semibold">Fecha/Hora</th>
-                                <th class="p-3 font-semibold">Área</th>
-                                <th class="p-3 font-semibold">Turno/Tipo</th>
-                                <th class="p-3 font-semibold">Personal</th>
-                                <th class="p-3 font-semibold">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-historial" class="divide-y divide-gray-100"></tbody>
-                    </table>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-900">🛡️ Autorización y Control de Turno</h2>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre del Supervisor en Turno (Obligatorio para Firmar)</label>
+                    <input type="text" id="supervisor-signature" class="w-full sm:w-80 p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none font-medium" placeholder="Ej. Chef Agustín">
                 </div>
             </div>
-        </section>
 
-        <section id="tab-admin" class="tab-content space-y-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-slate-700">🏢 Datos de la Sucursal Local</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Nombre Comercial del Restaurante</label>
-                        <input type="text" id="cfg-restaurante" class="w-full p-2 border rounded" value="Tacos y Montados FI-FÍ">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Sucursal / Identificador</label>
-                        <input type="text" id="cfg-sucursal" class="w-full p-2 border rounded" value="Matriz LocalStore">
-                    </div>
-                </div>
-                <button onclick="guardarConfigSucursal()" class="mt-4 bg-slate-800 text-white px-4 py-2 rounded text-sm hover:bg-slate-700">Actualizar Datos</button>
+            <div class="space-y-4">
+                <h3 class="text-sm font-bold text-slate-800 tracking-tight">Formatos en Espera de Validación</h3>
+                <div id="lista-pendientes" class="grid grid-cols-1 gap-4"></div>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="text-lg font-bold mb-4 text-slate-700">📍 Control de Áreas y Evidencias Fotográficas</h2>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-800">Historial de Turnos Validados (Semana Actual)</h3>
+                </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
+                    <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-gray-50 border-b">
-                                <th class="p-3 font-semibold">Área</th>
-                                <th class="p-3 font-semibold">Habilitar Foto de Evidencia</th>
+                            <tr class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase tracking-wider font-semibold">
+                                <th class="p-4">Registro / Hora</th>
+                                <th class="p-4">Área</th>
+                                <th class="p-4">Turno & Formato</th>
+                                <th class="p-4">Responsables</th>
+                                <th class="p-4 text-right">Estado</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-areas-config" class="divide-y divide-gray-200"></tbody>
+                        <tbody id="tabla-historial" class="divide-y divide-slate-100 text-slate-700"></tbody>
                     </table>
                 </div>
             </div>
         </section>
 
         <section id="tab-finanzas" class="tab-content space-y-6">
+            <div class="bg-slate-900 text-slate-200 p-5 rounded-xl space-y-2 border border-slate-800 shadow-inner">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">💡 Instrucción de Control de Mermas</h3>
+                <p class="text-xs leading-relaxed text-slate-300">
+                    Las mermas representan pérdidas directas sobre tu Utilidad Bruta. Para asegurar análisis financieros correctos basados en estrategias de <b>Mark In / Margen Objetivo</b>, registra todo insumo desechado o excedente. Registra el nombre del producto, calcula el costo total basándote en su costo unitario o por onza (ej. Ginebra o Filete) y detalla la causa exacta (error de corte, caducidad, preparación) para ajustar inventarios de manera eficiente.
+                </p>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <h2 class="text-lg font-bold mb-2 text-slate-700">🍹 Costeo de Recetas / Tragos (Mark In)</h2>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-gray-50 rounded border text-xs space-y-1">
-                            <span class="font-bold text-slate-700 block">Ejemplo Base: Cóctel Negroni</span>
-                            <p>• Gin (1 oz): $0.74 | • Vermouth (1 oz): $0.30 | • Campari (1 oz): $1.14</p>
-                            <p class="font-semibold text-blue-700 pt-1">Costo Insumos Total: $2.19 | Precio Sugerido (Cost 22%): $9.99</p>
-                        </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-base font-bold text-slate-900">🍹 Costeo de Recetas / Tragos</h2>
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-2">
+                        <span class="font-bold text-slate-800 block">Fórmula de Costeo Integrada (Mark In):</span>
+                        <p class="text-slate-600">Mapeo de insumos de tus planillas (Negroni Base): 1oz Gin ($0.74), 1oz Vermouth ($0.30), 1oz Campari ($1.14).</p>
+                        <p class="font-semibold text-slate-900 pt-1 border-t border-slate-200">Costo Bruto: $2.19 | Precio Sugerido Venta (Margen Objetivo 22%): $9.99</p>
                     </div>
-                    <div class="mt-4 pt-4 border-t space-y-3">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Calculadora Express de Precio</h4>
+
+                    <div class="space-y-3 pt-2">
+                        <h4 class="text-xs font-bold uppercase text-slate-400">Calculadora de Precio por Margen</h4>
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="calc-costo" placeholder="Costo Receta ($)" class="p-2 border rounded text-sm">
-                            <input type="number" id="calc-pct" placeholder="Porcentaje Costo (ej. 0.22)" class="p-2 border rounded text-sm">
+                            <input type="number" id="calc-costo" placeholder="Costo Insumos ($)" class="p-2 border border-slate-200 rounded-lg text-sm bg-slate-50 focus:outline-none">
+                            <input type="number" id="calc-pct" placeholder="Pct Costo (ej. 0.22)" class="p-2 border border-slate-200 rounded-lg text-sm bg-slate-50 focus:outline-none" value="0.22">
                         </div>
-                        <button onclick="calcularPrecioSugerido()" class="w-full bg-emerald-600 text-white p-2 text-xs font-bold rounded hover:bg-emerald-700">Calcular Precio Venta Sugerido</button>
-                        <p id="calc-resultado" class="text-sm font-bold text-center text-emerald-700"></p>
+                        <button onclick="calcularPrecioSugerido()" class="w-full bg-slate-950 hover:bg-slate-800 text-white py-2 text-xs font-bold rounded-lg transition">Calcular Precio Sugerido</button>
+                        <p id="calc-resultado" class="text-sm font-bold text-center text-slate-900 pt-1"></p>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <h2 class="text-lg font-bold mb-2 text-slate-700">📉 Registro y Control de Mermas</h2>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-base font-bold text-slate-900">📉 Captura de Insumos Mermados</h2>
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="text" id="merma-insumo" placeholder="Insumo" class="p-2 border rounded text-sm">
-                            <input type="number" id="merma-costo" placeholder="Costo Pérdida ($)" class="p-2 border rounded text-sm">
+                            <input type="text" id="merma-insumo" placeholder="Insumo (ej. Filete res)" class="p-2 border border-slate-200 rounded-lg text-sm bg-slate-50 focus:outline-none">
+                            <input type="number" id="merma-costo" placeholder="Pérdida Económica ($)" class="p-2 border border-slate-200 rounded-lg text-sm bg-slate-50 focus:outline-none">
                         </div>
-                        <input type="text" id="merma-motivo" placeholder="Motivo de la merma" class="p-2 border rounded text-sm w-full">
-                        <button onclick="agregarMermaLocal()" class="w-full bg-slate-800 text-white p-2 text-xs font-bold rounded hover:bg-slate-900">Registrar Pérdida Económica</button>
+                        <input type="text" id="merma-motivo" placeholder="Motivo o Justificación del desperdicio" class="p-2 border border-slate-200 rounded-lg text-sm bg-slate-50 focus:outline-none w-full">
+                        <button onclick="agregarMermaLocal()" class="w-full bg-slate-950 hover:bg-slate-800 text-white py-2 text-xs font-bold rounded-lg transition">Registrar Pérdida Financiera</button>
                     </div>
-                    <div class="mt-4 max-h-40 overflow-y-auto border-t pt-2">
-                        <ul id="lista-mermas" class="text-xs divide-y space-y-1"></ul>
+                    <div class="border-t border-slate-100 pt-3 max-h-40 overflow-y-auto">
+                        <ul id="lista-mermas" class="text-xs space-y-2"></ul>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-admin" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-900">🏢 Datos de la Unidad de Negocio</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre Comercial</label>
+                        <input type="text" id="cfg-restaurante" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" value="Tacos y Montados FI-FÍ">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Identificador de Sucursal</label>
+                        <input type="text" id="cfg-sucursal" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" value="Matriz LocalStore">
+                    </div>
+                </div>
+                <button onclick="guardarConfigSucursal()" class="bg-slate-950 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-medium transition">Actualizar Establecimiento</button>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-900">📍 CRUD: Gestión de Puntos de Inspección por Área</h2>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Área</label>
+                        <select id="crud-area" class="w-full p-1.5 text-xs bg-white border border-slate-200 rounded focus:outline-none">
+                            <option value="cocina">Cocina</option>
+                            <option value="parrilla">Parrilla FI-FÍ</option>
+                            <option value="meseros">Servicio Meseros</option>
+                            <option value="barra">Barra</option>
+                            <option value="caja">Caja</option>
+                            <option value="salon">Limpieza de Salón</option>
+                            <option value="almacen">Almacén</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Turno</label>
+                        <select id="crud-turno" class="w-full p-1.5 text-xs bg-white border border-slate-200 rounded focus:outline-none">
+                            <option value="matutino">Matutino</option>
+                            <option value="vespertino">Vespertino</option>
+                            <option value="nocturno">Nocturno</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Formato</label>
+                        <select id="crud-tipo" class="w-full p-1.5 text-xs bg-white border border-slate-200 rounded focus:outline-none">
+                            <option value="apertura">Apertura</option>
+                            <option value="cierre">Cierre</option>
+                            <option value="express">Express</option>
+                        </select>
+                    </div>
+                    <button onclick="filtrarCrudTareas()" class="w-full bg-slate-800 hover:bg-slate-700 text-white py-1.5 text-xs font-bold rounded transition">Filtrar Catálogo</button>
+                </div>
+
+                <div class="space-y-2 border-t border-slate-100 pt-3">
+                    <label class="block text-xs font-bold text-slate-700">Agregar o Editar Punto de Criterio</label>
+                    <div class="flex gap-2">
+                        <input type="hidden" id="crud-edit-id" value="">
+                        <input type="text" id="crud-desc-input" placeholder="Escribe la descripción de la tarea operativa..." class="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:outline-none">
+                        <button onclick="guardarPuntoInspeccion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Guardar Punto</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-100 rounded-lg mt-4">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold">
+                            <tr>
+                                <th class="p-3">Descripción de Tarea</th>
+                                <th class="p-3 w-32 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crud-tabla-tareas" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-900">📸 Configuración de Evidencias</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 border-b border-slate-200 font-semibold">
+                                <th class="p-3">Área de Trabajo</th>
+                                <th class="p-3 text-right">Estatus de Cámara</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-areas-config" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-slate-800 text-gray-400 text-center py-3 text-xs border-t border-slate-700 mt-auto">
-        <p>© 2026 Sistema Local Multiturno para Restaurantes de 24 Horas. Todo guardado en IndexedDB Local.</p>
+    <footer class="bg-white border-t border-slate-200 text-slate-400 text-center py-4 text-[11px] font-medium mt-auto">
+        <p>© 2026 PRO26 — Sistema de Ingeniería Operativa Multiturno Desarrollado para Agustín.</p>
     </footer>
 
     <script>
         let db;
-        const DB_NAME = "RestauranteAppDB";
+        const DB_NAME = "PRO26_DB";
         const DB_VERSION = 1;
+        let pinAutenticado = false;
 
-        const TAREAS_SEMILLA = [
-            { id: 1, area: "cocina", desc: "Las estufas, parrillas y plancha quedan limpias, sin residuos de comida ni grasa", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 2, area: "cocina", desc: "Todos los alimentos quedan bien tapados en refrigeradores o almacén repisas", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 3, area: "cocina", desc: "Verificar que todo el producto se encuentre etiquetado bajo sistema PEPS", tipos: ["apertura","express"], turnos: ["matutino","vespertino"] },
-            { id: 4, area: "parrilla", desc: "Realizar el lavado de manos y firmar planilla de técnica de limpieza", tipos: ["apertura","cierre"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 5, area: "parrilla", desc: "Verificar llave de gas cerrada y extractores apagados", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 6, area: "meseros", desc: "Mesa montada: Centro de mesa, salsas, cubiertos en orden y posición", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 7, area: "caja", desc: "Validación de fondo de caja y arqueo inicial de turno", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 8, area: "salon", desc: "Limpieza profunda de pisos, cristales y estaciones de servicio", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] }
+        // CARGA TOTAL DE TUS ARCHIVOS OPERATIVOS INTEGRADA DE FORMA SEMILLA
+        let TAREAS_SEMILLA = [
+            // COCINA CIERRE (Archivo: CHECK LIST DE CIERRE DE COCINA.xlsx)
+            { id: 1, area: "cocina", desc: "Todos los alimentos quedan bien tapados (refrigeradores, congelador, almacén repisas)", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 2, area: "cocina", desc: "El área de producción queda limpia y desinfectada", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 3, area: "cocina", desc: "Los pisos de toda la cocina quedan limpios, incluyendo detrás de estufas y refrigeradores", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 4, area: "cocina", desc: "Las paredes quedan limpias y libres de manchas o grasa", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 5, area: "cocina", desc: "Las tarjas quedan limpias y sin residuos de alimentos", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 6, area: "cocina", desc: "Los platos quedan acomodados en su lugar o bien escurriéndose en el estante", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 7, area: "cocina", desc: "Las tapaderas quedan dentro de la caja correspondiente", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 8, area: "cocina", desc: "Los cubiertos quedan limpios y dentro de un recipiente todos juntos", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 9, area: "cocina", desc: "Los estantes, mesas de trabajo y repisas quedan limpios y desinfectados", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 10, area: "cocina", desc: "Las mesas frías y la caliente quedan limpias y sin hielo ni residuos de comida", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 11, area: "cocina", desc: "La freidora queda limpia, por dentro y por fuera (aceite tapado con charola)", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 12, area: "cocina", desc: "Los refrigeradores y almacén quedan limpios", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 13, area: "cocina", desc: "Los extractores quedan apagados", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 14, area: "cocina", desc: "La campana queda limpia y libre de grasa", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 15, area: "cocina", desc: "La basura se saca a las 7:30 PM (basura posterior se amarra y se cierran las bolsas)", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 16, area: "cocina", desc: "Los botes de basura quedan limpios", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 17, area: "cocina", desc: "Los trapeadores se lavan y quedan limpios después de utilizarlos", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 18, area: "cocina", desc: "Los trapos se dejan remojando en una cubeta con un poco de cloro", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 19, area: "cocina", desc: "Las estufas, parrillas y plancha quedan limpias, sin residuos de comida ni grasa", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
+
+            // PARRILLA FI-FÍ (Archivo: CHECK LIST DE PARRILLA FI-FÍ.xlsx)
+            { id: 20, area: "parrilla", desc: "Portar uniforme completo: Filipina roja, playera fifi, pantalón negro, visera con red roja, mandil con logotipo, tenis negros y 3 plumas de click", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 21, area: "parrilla", desc: "Registrar entrada mediante huella digital y realizar lavado de manos riguroso", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 22, area: "parrilla", desc: "Realizar el inventario inicial llenando la sección CONTROL DE PARRILLA", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 23, area: "parrilla", desc: "Limpiar, lavar, enjuagar y desinfectar toda el área (barras, campana, temperador, refrigeradores, tapetes)", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 24, area: "parrilla", desc: "Verificar etiquetado y acomodo de producto conforme al sistema PEPS", tipos: ["apertura","express"], turnos: ["matutino","vespertino"] },
+            { id: 25, area: "parrilla", desc: "Realizar producción y carga de carnes: Bistec, Tripa, Adobo, Al Pastor", tipos: ["apertura"], turnos: ["matutino","vespertino"] },
+            { id: 26, area: "parrilla", desc: "Cambiar bolsa de botes de basura al llegar a 3/4 de su capacidad", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 27, area: "parrilla", desc: "Lavar con FULL POWER y enjuagar la parrilla al finalizar el servicio", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 28, area: "parrilla", desc: "Dejar las mamilas de salsas en solución profunda con Eurochlor", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 29, area: "parrilla", desc: "Verificar cierre de la llave general de gas y extractor apagado", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 30, area: "parrilla", desc: "Realizar inventario final físico para cuadre del CONTROL DE PARRILLA", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+
+            // MESEROS SERVICIO (Archivo: check list cursos 2020.docx)
+            { id: 31, area: "meseros", desc: "Check de limpieza profunda y carga completa del área de servicio", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 32, area: "meseros", desc: "Saludo y Bienvenida nombrando el negocio y presentación del vendedor", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 33, area: "meseros", desc: "Pregunta rompe hielo, entrega de menú y ofrecimiento activo de promociones", tipos: ["apertura","express"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 34, area: "meseros", desc: "Levantamiento orden de bebidas con técnica de venta sugestiva", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 35, area: "meseros", desc: "Levantamiento orden de alimentos aplicando venta con UPSALE (revisar comanda, tiempos, peticiones)", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 36, area: "meseros", desc: "Montaje correcto de mesa: centro de mesa, salsas, cubiertos (orden/posición) y platos", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 37, area: "meseros", desc: "Monitorear tiempos, pregunta de seguimiento '¿Falta algo?' y retiro de muertos continuo", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] }
         ];
 
         let areasCatalogo = [
@@ -207,62 +340,101 @@
         ];
 
         let fotosCargadasEnChecklistActual = 0;
+        let tabDestinoBloqueado = "";
 
         function initDB() {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
-            request.onerror = function(event) { console.error("Error IndexedDB:", event.target.error); };
-            request.onupgradeneeded = function(event) {
-                db = event.target.result;
+            request.onupgradeneeded = function(e) {
+                db = e.target.result;
                 if (!db.objectStoreNames.contains("configuracion")) { db.createObjectStore("configuracion", { keyPath: "id" }); }
                 if (!db.objectStoreNames.contains("checklists")) { db.createObjectStore("checklists", { keyPath: "id", autoIncrement: true }); }
                 if (!db.objectStoreNames.contains("mermas")) { db.createObjectStore("mermas", { keyPath: "id", autoIncrement: true }); }
+                if (!db.objectStoreNames.contains("tareas_dinamicas")) { db.createObjectStore("tareas_dinamicas", { keyPath: "id", autoIncrement: true }); }
             };
-            request.onsuccess = function(event) {
-                db = event.target.result;
-                verificarCicloSemanalYConfiguracion();
+            request.onsuccess = function(e) {
+                db = e.target.result;
+                sincronizarTareasYConfig();
             };
         }
 
-        function verificarCicloSemanalYConfiguracion() {
-            const tx = db.transaction(["configuracion"], "readwrite");
-            const store = tx.objectStore("configuracion");
-            store.get("ciclo_inicio").onsuccess = function(e) {
+        function sincronizarTareasYConfig() {
+            const tx = db.transaction(["configuracion", "tareas_dinamicas"], "readwrite");
+            const configStore = tx.objectStore("configuracion");
+            const tareasStore = tx.objectStore("tareas_dinamicas");
+
+            configStore.get("ciclo_inicio").onsuccess = function(e) {
                 if (!e.target.result) {
                     const hoy = new Date().toISOString().split('T')[0];
-                    store.put({ id: "ciclo_inicio", fecha: hoy });
+                    configStore.put({ id: "ciclo_inicio", fecha: hoy });
                     document.getElementById("cycle-start-date").innerText = hoy;
                 } else {
                     document.getElementById("cycle-start-date").innerText = e.target.result.fecha;
-                    comprobarBloqueoFechas(e.target.result.fecha);
+                    comprobarBloqueoCiclo(e.target.result.fecha);
                 }
             };
-            store.get("areas_lista").onsuccess = function(e) {
-                if (!e.target.result) { store.put({ id: "areas_lista", datos: areasCatalogo }); }
+
+            configStore.get("areas_lista").onsuccess = function(e) {
+                if (!e.target.result) { configStore.put({ id: "areas_lista", datos: areasCatalogo }); }
                 else { areasCatalogo = e.target.result.datos; }
                 inicializarCombosUI();
             };
+
+            tareasStore.count().onsuccess = function(e) {
+                if (e.target.result === 0) {
+                    TAREAS_SEMILLA.forEach(t => tareasStore.add(t));
+                }
+            };
         }
 
-        function comprobarBloqueoFechas(fechaInicioStr) {
+        function comprobarBloqueoCiclo(fechaInicioStr) {
             const inicio = new Date(fechaInicioStr);
             const hoy = new Date();
-            const diffTime = Math.abs(hoy - inicio);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const diffDays = Math.ceil(Math.abs(hoy - inicio) / (1000 * 60 * 60 * 24));
             if (diffDays >= 7) {
                 document.getElementById("weekly-lock-banner").classList.remove("hidden");
                 document.getElementById("btn-save-checklist").disabled = true;
-                document.getElementById("btn-save-checklist").innerText = "SISTEMA BLOQUEADO - EXPORTAR PDF";
-                document.getElementById("btn-save-checklist").classList.replace("bg-blue-600", "bg-gray-400");
+                document.getElementById("btn-save-checklist").className = "bg-slate-300 text-slate-500 px-5 py-2 rounded-lg text-sm font-medium cursor-not-allowed";
             }
         }
 
+        // --- SISTEMA DE PIN (4 DÍGITOS PARA AGUSTIN) ---
         function switchTab(tabId) {
+            if (tabId === "tab-admin" && !pinAutenticado) {
+                tabDestinoBloqueado = tabId;
+                document.getElementById("pin-modal").classList.remove("hidden");
+                document.getElementById("pin-input").focus();
+                return;
+            }
+            ejecutarCambioTab(tabId);
+        }
+
+        function validarPin() {
+            const pin = document.getElementById("pin-input").value;
+            if (pin === "2026") {
+                pinAutenticado = true;
+                document.getElementById("pin-modal").classList.add("hidden");
+                document.getElementById("pin-input").value = "";
+                ejecutarCambioTab(tabDestinoBloqueado || "tab-admin");
+            } else {
+                alert("PIN incorrecto. Acceso restringido.");
+                document.getElementById("pin-input").value = "";
+            }
+        }
+
+        function cerrarPinModal(fuerza) {
+            document.getElementById("pin-modal").classList.add("hidden");
+            document.getElementById("pin-input").value = "";
+        }
+
+        function ejecutarCambioTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.replace('border-blue-600', 'border-transparent'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.replace('text-blue-600', 'text-gray-600'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.replace('border-slate-900', 'border-transparent'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.replace('text-slate-900', 'text-slate-500'));
+
             document.getElementById(tabId).classList.add('active');
-            document.getElementById('btn-' + tabId).classList.replace('border-transparent', 'border-blue-600');
-            document.getElementById('btn-' + tabId).classList.replace('text-gray-600', 'text-blue-600');
+            document.getElementById('btn-' + tabId).classList.replace('border-transparent', 'border-slate-900');
+            document.getElementById('btn-' + tabId).classList.replace('text-slate-500', 'text-slate-900');
+
             if (tabId === 'tab-supervisor') renderizarSupervisor();
             if (tabId === 'tab-admin') renderizarAdminConfig();
             if (tabId === 'tab-finanzas') renderizarMermas();
@@ -288,52 +460,58 @@
             contenedor.innerHTML = "";
             fotosCargadasEnChecklistActual = 0;
             actualizarContadorFotosUI();
-            const areaConfig = areasCatalogo.find(a => a.id === areaSel);
-            const requiereFotoArea = areaConfig ? areaConfig.requiresFoto || areaConfig.requiereFoto : false;
-            if (requiereFotoArea) { document.getElementById("photo-counter-badge").classList.remove("hidden"); }
+
+            const configArea = areasCatalogo.find(a => a.id === areaSel);
+            const requiereFoto = configArea ? configArea.requiereFoto : false;
+
+            if (requiereFoto) { document.getElementById("photo-counter-badge").classList.remove("hidden"); }
             else { document.getElementById("photo-counter-badge").classList.add("hidden"); }
-            const tareasFiltradas = TAREAS_SEMILLA.filter(t => t.area === areaSel && t.tipos.includes(tipoSel) && t.turnos.includes(turnoSel));
-            if (tareasFiltradas.length === 0) {
-                contenedor.innerHTML = `<p class="text-sm text-gray-500 italic p-4 text-center">No hay tareas específicas preconfiguradas para esta sección en este turno. Puede enviar la lista como validada.</p>`;
-                return;
-            }
-            tareasFiltradas.forEach(t => {
-                let itemDiv = document.createElement("div");
-                itemDiv.className = "pt-4 first:pt-0 space-y-3";
-                itemDiv.innerHTML = `
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                        <p class="text-sm font-medium text-gray-700 max-w-xl">${t.desc}</p>
-                        <div class="flex items-center space-x-4">
-                            <label class="flex items-center space-x-1 cursor-pointer">
-                                <input type="radio" name="status-${t.id}" value="SI" checked class="text-green-600 focus:ring-green-500" onclick="toggleCamposViolacion(${t.id}, false)">
-                                <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">CUMPLE</span>
-                            </label>
-                            <label class="flex items-center space-x-1 cursor-pointer">
-                                <input type="radio" name="status-${t.id}" value="NO" class="text-red-600 focus:ring-red-500" onclick="toggleCamposViolacion(${t.id}, true)">
-                                <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded">VIOLACIÓN</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div id="block-violacion-${t.id}" class="hidden bg-red-50 p-3 rounded-md border border-red-100 space-y-2">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs font-bold text-red-700 mb-1">Describa la Violación Detectada *</label>
-                                <input type="text" id="input-violacion-${t.id}" class="w-full p-2 border border-red-200 rounded text-xs bg-white" placeholder="Ej. Cochambre acumulado en quemador">
+
+            const tx = db.transaction(["tareas_dinamicas"], "readonly");
+            tx.objectStore("tareas_dinamicas").openCursor().onsuccess = function(e) {
+                const cursor = e.target.result;
+                if (cursor) {
+                    const t = cursor.value;
+                    if (t.area === areaSel && t.tipos.includes(tipoSel) && t.turnos.includes(turnoSel)) {
+                        let itemDiv = document.createElement("div");
+                        itemDiv.className = "py-4 flex flex-col gap-3";
+                        itemDiv.innerHTML = `
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <p class="text-xs font-medium text-slate-700 max-w-2xl">${t.desc}</p>
+                                <div class="flex items-center gap-3">
+                                    <label class="flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" name="status-${t.id}" value="SI" checked class="text-slate-900 focus:ring-slate-900" onclick="toggleCamposViolacion(${t.id}, false)">
+                                        <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">CUMPLE</span>
+                                    </label>
+                                    <label class="flex items-center gap-1 cursor-pointer">
+                                        <input type="radio" name="status-${t.id}" value="NO" class="text-rose-600 focus:ring-rose-600" onclick="toggleCamposViolacion(${t.id}, true)">
+                                        <span class="text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-md">VIOLACIÓN</span>
+                                    </label>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold text-emerald-700 mb-1">Acción Correctiva Inmediata *</label>
-                                <input type="text" id="input-correccion-${t.id}" class="w-full p-2 border border-emerald-200 rounded text-xs bg-white" placeholder="Ej. Se aplicó desengrasante">
-                            </div>
-                        </div>
-                        ${requiereFotoArea ? `
-                        <div class="pt-2">
-                            <label class="block text-xs font-bold text-gray-600 mb-1">Foto de Evidencia (Máximo 3 por turno global)</label>
-                            <input type="file" accept="image/*" id="foto-${t.id}" onchange="procesarFotoBase64(${t.id})" class="text-xs block w-full text-slate-500">
-                            <input type="hidden" id="hidden-b64-${t.id}">
-                        </div>` : ''}
-                    </div>`;
-                contenedor.appendChild(itemDiv);
-            });
+                            <div id="block-violacion-${t.id}" class="hidden bg-rose-50/50 p-4 rounded-lg border border-rose-100 space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-rose-700 uppercase mb-1">Descripción de Violación</label>
+                                        <input type="text" id="input-violacion-${t.id}" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none" placeholder="Falla detectada...">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Acción Correctiva (Qué hacer)</label>
+                                        <input type="text" id="input-correccion-${t.id}" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none" placeholder="Corrección aplicada...">
+                                    </div>
+                                </div>
+                                ${requiereFoto ? `
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cargar Foto de Evidencia</label>
+                                    <input type="file" accept="image/*" id="foto-${t.id}" onchange="procesarFotoBase64(${t.id})" class="text-xs text-slate-500 file:mr-4 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-900 file:text-white hover:file:bg-slate-800">
+                                    <input type="hidden" id="hidden-b64-${t.id}">
+                                </div>` : ''}
+                            </div>`;
+                        contenedor.appendChild(itemDiv);
+                    }
+                    cursor.continue();
+                }
+            };
         }
 
         function toggleCamposViolacion(id, mostrar) {
@@ -341,10 +519,10 @@
             if (mostrar) { div.classList.remove("hidden"); }
             else {
                 div.classList.add("hidden");
-                const hiddenInput = document.getElementById(`hidden-b64-${id}`);
-                if (hiddenInput && hiddenInput.value) {
-                    hiddenInput.value = "";
-                    fotosCargadasEnChecklistActual--;
+                const hid = document.getElementById(`hidden-b64-${id}`);
+                if (hid && hid.value) {
+                    hid.value = "";
+                    fotosCargadasEnChecklistActual = Math.max(0, fotosCargadasEnChecklistActual - 1);
                     actualizarContadorFotosUI();
                 }
             }
@@ -353,7 +531,7 @@
         function procesarFotoBase64(id) {
             const fileInput = document.getElementById(`foto-${id}`);
             if (fotosCargadasEnChecklistActual >= 3) {
-                alert("Límite alcanzado: Máximo 3 fotos de evidencia por checklist.");
+                alert("Límite estratégico: Máximo 3 fotos globales por formato.");
                 fileInput.value = "";
                 return;
             }
@@ -370,130 +548,247 @@
         }
 
         function actualizarContadorFotosUI() {
-            const countSpan = document.getElementById("photo-count");
-            if (countSpan) countSpan.innerText = fotosCargadasEnChecklistActual;
+            const el = document.getElementById("photo-count");
+            if (el) el.innerText = fotosCargadasEnChecklistActual;
         }
 
         function guardarChecklist() {
             const empleado = document.getElementById("op-empleado").value.trim();
-            if (!empleado) { return alert("Por favor complete el nombre del empleado operativo."); }
+            if (!empleado) return alert("Ingrese el nombre del operativo a cargo.");
+
             const areaSel = document.getElementById("op-area").value;
             const turnoSel = document.getElementById("op-turno").value;
             const tipoSel = document.getElementById("op-tipo").value;
-            const tareasFiltradas = TAREAS_SEMILLA.filter(t => t.area === areaSel && t.tipos.includes(tipoSel) && t.turnos.includes(turnoSel));
+
             let respuestas = [];
             let validacionCorrecta = true;
-            tareasFiltradas.forEach(t => {
-                const cumpleRadio = document.querySelector(`input[name="status-${t.id}"]:checked`).value;
-                let itemResp = { tarea_id: t.id, desc: t.desc, cumple: cumpleRadio === "SI" };
-                if (cumpleRadio === "NO") {
-                    const violacion = document.getElementById(`input-violacion-${t.id}`).value.trim();
-                    const correccion = document.getElementById(`input-correccion-${t.id}`).value.trim();
-                    if (!violacion || !correccion) { validacionCorrecta = false; }
-                    itemResp.violacion = violacion;
-                    itemResp.correccion = correccion;
-                    const fotoInput = document.getElementById(`hidden-b64-${t.id}`);
-                    if (fotoInput && fotoInput.value) { itemResp.foto = fotoInput.value; }
+
+            const tx = db.transaction(["tareas_dinamicas"], "readonly");
+            tx.objectStore("tareas_dinamicas").openCursor().onsuccess = function(e) {
+                const cursor = e.target.result;
+                if (cursor) {
+                    const t = cursor.value;
+                    if (t.area === areaSel && t.tipos.includes(tipoSel) && t.turnos.includes(turnoSel)) {
+                        const cumpleRadio = document.querySelector(`input[name="status-${t.id}"]:checked`).value;
+                        let respObj = { tarea_id: t.id, desc: t.desc, cumple: cumpleRadio === "SI" };
+
+                        if (cumpleRadio === "NO") {
+                            const violacion = document.getElementById(`input-violacion-${t.id}`).value.trim();
+                            const correccion = document.getElementById(`input-correccion-${t.id}`).value.trim();
+                            if (!violacion || !correccion) validacionCorrecta = false;
+                            
+                            respObj.violacion = violacion;
+                            respObj.correccion = correccion;
+
+                            const fInput = document.getElementById(`hidden-b64-${t.id}`);
+                            if (fInput && fInput.value) respObj.foto = fInput.value;
+                        }
+                        respuestas.push(respObj);
+                    }
+                    cursor.continue();
+                } else {
+                    if (!validacionCorrecta) return alert("Complete los campos de Violación y Acción Correctiva.");
+
+                    const nuevoFormato = {
+                        fecha: new Date().toISOString().split('T')[0],
+                        hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        area: areaSel,
+                        turno: turnoSel,
+                        tipo: tipoSel,
+                        empleado: empleado,
+                        estado: "pendiente_supervisor",
+                        supervisor: "",
+                        respuestas: respuestas
+                    };
+
+                    const txSave = db.transaction(["checklists"], "readwrite");
+                    txSave.objectStore("checklists").add(nuevoFormato).onsuccess = function() {
+                        alert("✅ Formato registrado. En espera de firma del supervisor.");
+                        document.getElementById("op-empleado").value = "";
+                        actualizarTareasUI();
+                    };
                 }
-                respuestas.push(itemResp);
-            });
-            if (!validacionCorrecta) { return alert("Debe detallar la descripción de la falla y su corrección obligatoriamente."); }
-            const nuevoChecklist = {
-                fecha: new Date().toISOString().split('T')[0],
-                hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                area: areaSel,
-                turno: turnoSel,
-                tipo: tipoSel,
-                empleado: empleado,
-                estado: "pendiente_supervisor",
-                supervisor: "",
-                respuestas: respuestas
-            };
-            const tx = db.transaction(["checklists"], "readwrite");
-            tx.objectStore("checklists").add(nuevoChecklist).onsuccess = function() {
-                alert("✅ ¡Checklist enviado con éxito al supervisor!");
-                document.getElementById("op-empleado").value = "";
-                actualizarTareasUI();
             };
         }
 
+        // --- INTERFAZ PANEL SUPERVISOR CON AUTORIZACIÓN AL INICIO ---
         function renderizarSupervisor() {
             const divPendientes = document.getElementById("lista-pendientes");
             const tablaHistorial = document.getElementById("tabla-historial");
             divPendientes.innerHTML = "";
             tablaHistorial.innerHTML = "";
+
             const tx = db.transaction(["checklists"], "readonly");
-            tx.objectStore("checklists").openCursor().onsuccess = function(event) {
-                const cursor = event.target.result;
+            tx.objectStore("checklists").openCursor().onsuccess = function(e) {
+                const cursor = e.target.result;
                 if (cursor) {
                     const item = cursor.value;
                     if (item.estado === "pendiente_supervisor") {
                         let card = document.createElement("div");
-                        card.className = "p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3 shadow-sm";
-                        let violacionesCount = item.respuestas.filter(r => !r.cumple).length;
+                        card.className = "bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between";
+                        let vCount = item.respuestas.filter(r => !r.cumple).length;
+
                         card.innerHTML = `
-                            <div class="flex justify-between items-start">
+                            <div class="flex justify-between items-start border-b border-slate-100 pb-3">
                                 <div>
-                                    <span class="text-xs uppercase font-bold bg-amber-200 px-2 py-0.5 rounded">${item.turno} | ${item.tipo}</span>
-                                    <h4 class="font-bold text-slate-800 text-sm mt-1">Área: <span class="capitalize">${item.area}</span></h4>
-                                    <p class="text-xs text-gray-600">Levantado por: <b>${item.empleado}</b> a las ${item.hora} hrs</p>
+                                    <span class="text-[10px] uppercase font-bold tracking-wider bg-slate-100 text-slate-800 px-2 py-0.5 rounded-md">${item.turno} / ${item.tipo}</span>
+                                    <h4 class="font-bold text-slate-900 text-sm mt-1.5 capitalize">Área: ${item.area}</h4>
+                                    <p class="text-[11px] text-slate-500">Operador: <b>${item.empleado}</b> • Generado: ${item.hora} hrs</p>
                                 </div>
-                                <span class="text-xs font-bold text-red-700">${violacionesCount} Violación(es)</span>
+                                <span class="text-xs font-semibold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md">${vCount} Incidencias</span>
                             </div>
-                            <div class="space-y-1 pl-2 border-l-2 border-amber-300 text-xs text-gray-700">
-                                ${item.respuestas.map(r => `<p>• ${r.desc}: ${r.cumple ? '🟢 OK' : `🔴 Falla: ${r.violacion} | Corr: ${r.correccion}`}</p>`).join('')}
+                            <div class="text-xs space-y-2 text-slate-600">
+                                ${item.respuestas.map(r => `
+                                    <p>• <b>${r.desc}</b><br>
+                                    ${r.cumple ? '<span class="text-emerald-600 font-medium">🟢 Conforme</span>' : `<span class="text-rose-600 font-medium">🔴 Falla: ${r.violacion}</span> | <span class="text-slate-800 font-medium">Solución: ${r.correccion}</span>`}
+                                    ${r.foto ? `<span class="text-blue-500 block italic text-[10px]">[Foto Guardada en IndexedDB]</span>` : ''}</p>
+                                `).join('')}
                             </div>
-                            <div class="flex items-center space-x-2 pt-2 border-t">
-                                <input type="text" id="super-name-${cursor.key}" placeholder="Nombre de Supervisor" class="p-1.5 text-xs border rounded bg-white">
-                                <button onclick="autorizarChecklist(${cursor.key})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-bold">Validar y Firmar</button>
+                            <div class="pt-3 border-t border-slate-100 flex justify-end">
+                                <button onclick="autorizarFormatoRapido(${cursor.key})" class="bg-slate-950 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-bold transition">Firma Autorización Rápida</button>
                             </div>`;
                         divPendientes.appendChild(card);
                     } else {
-                        let fila = document.createElement("tr");
-                        fila.className = "border-b hover:bg-gray-50";
-                        fila.innerHTML = `<td class="p-3 text-xs">${item.fecha} ${item.hora}</td><td class="p-3 text-xs font-bold capitalize">${item.area}</td><td class="p-3 text-xs">${item.turno} / ${item.tipo}</td><td class="p-3 text-xs">Op: ${item.empleado}<br><span class="text-gray-500 text-[10px]">Sup: ${item.supervisor}</span></td><td class="p-3 text-xs text-green-600 font-bold">✓ Revisado</td>`;
-                        tablaHistorial.appendChild(fila);
+                        let tr = document.createElement("tr");
+                        tr.className = "border-b border-slate-100 hover:bg-slate-50/50";
+                        tr.innerHTML = `<td class="p-4">${item.fecha} a las ${item.hora}</td><td class="p-4 font-bold capitalize">${item.area}</td><td class="p-4 capitalize">${item.turno} (${item.tipo})</td><td class="p-4">Op: ${item.empleado}<br><span class="text-slate-400 font-medium text-[10px]">Supervisor: ${item.supervisor}</span></td><td class="p-4 text-right text-emerald-600 font-bold">✓ Archivado</td>`;
+                        tablaHistorial.appendChild(tr);
                     }
                     cursor.continue();
                 } else {
-                    if (divPendientes.innerHTML === "") { divPendientes.innerHTML = `<p class="text-sm text-gray-500 italic py-4 text-center">No hay listas operativas esperando firmas.</p>`; }
+                    if (divPendientes.innerHTML === "") {
+                        divPendientes.innerHTML = `<p class="text-xs text-slate-400 italic py-6 text-center bg-white rounded-xl border border-dashed border-slate-200">No hay formatos pendientes de revisión.</p>`;
+                    }
                 }
             };
         }
 
-        function autorizarChecklist(id) {
-            const supName = document.getElementById(`super-name-${id}`).value.trim();
-            if (!supName) return alert("Debe escribir su nombre como supervisor para autorizar.");
+        function autorizarFormatoRapido(id) {
+            const supervisor = document.getElementById("supervisor-signature").value.trim();
+            if (!supervisor) return alert("Por favor escribe tu nombre como Supervisor al inicio de la página para poder firmar.");
+
             const tx = db.transaction(["checklists"], "readwrite");
             const store = tx.objectStore("checklists");
             store.get(id).onsuccess = function(e) {
                 let data = e.target.result;
                 data.estado = "aprobado";
-                data.supervisor = supName;
+                data.supervisor = supervisor;
                 store.put(data).onsuccess = function() {
-                    alert("Lista archivada en el ciclo semanal.");
                     renderizarSupervisor();
                 };
             };
         }
 
+        // --- CRUD DE PUNTOS DE INSPECCIÓN (ADMINISTRATIVO PROTEGIDO) ---
+        let listaCrudTareas = [];
+        function filtrarCrudTareas() {
+            const area = document.getElementById("crud-area").value;
+            const turno = document.getElementById("crud-turno").value;
+            const tipo = document.getElementById("crud-tipo").value;
+            const tbody = document.getElementById("crud-tabla-tareas");
+            tbody.innerHTML = "";
+            listaCrudTareas = [];
+
+            const tx = db.transaction(["tareas_dinamicas"], "readonly");
+            tx.objectStore("tareas_dinamicas").openCursor().onsuccess = function(e) {
+                const cursor = e.target.result;
+                if (cursor) {
+                    const t = cursor.value;
+                    if (t.area === area && t.turnos.includes(turno) && t.tipos.includes(tipo)) {
+                        listaCrudTareas.push(t);
+                        let tr = document.createElement("tr");
+                        tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                        tr.innerHTML = `
+                            <td class="p-3 text-slate-700 font-medium">${t.desc}</td>
+                            <td class="p-3 text-center flex gap-1 justify-center">
+                                <button onclick="cargarEditarTarea(${t.id}, '${t.desc}')" class="bg-slate-200 text-slate-800 px-2 py-1 rounded text-[11px] font-bold">Editar</button>
+                                <button onclick="eliminarTareaCrud(${t.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[11px] font-bold">Eliminar</button>
+                            </td>`;
+                        tbody.appendChild(tr);
+                    }
+                    cursor.continue();
+                } else {
+                    if (tbody.innerHTML === "") {
+                        tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-slate-400 italic">No hay criterios para este filtro.</td></tr>`;
+                    }
+                }
+            };
+        }
+
+        function cargarEditarTarea(id, desc) {
+            document.getElementById("crud-edit-id").value = id;
+            document.getElementById("crud-desc-input").value = desc;
+        }
+
+        function guardarPuntoInspeccion() {
+            const desc = document.getElementById("crud-desc-input").value.trim();
+            if (!desc) return alert("Escribe la descripción de la tarea.");
+
+            const id = document.getElementById("crud-edit-id").value;
+            const area = document.getElementById("crud-area").value;
+            const turno = document.getElementById("crud-turno").value;
+            const tipo = document.getElementById("crud-tipo").value;
+
+            const tx = db.transaction(["tareas_dinamicas"], "readwrite");
+            const store = tx.objectStore("tareas_dinamicas");
+
+            if (id) {
+                // Modo Edición
+                store.get(parseInt(id)).onsuccess = function(e) {
+                    let data = e.target.result;
+                    data.desc = desc;
+                    store.put(data).onsuccess = function() {
+                        limpiarFormCrud();
+                        filtrarCrudTareas();
+                        actualizarTareasUI();
+                    };
+                };
+            } else {
+                // Modo Nuevo
+                const nuevaTarea = { area, desc, tipos: [tipo], turnos: [turno] };
+                store.add(nuevaTarea).onsuccess = function() {
+                    limpiarFormCrud();
+                    filtrarCrudTareas();
+                    actualizarTareasUI();
+                };
+            }
+        }
+
+        function eliminarTareaCrud(id) {
+            if (!confirm("¿Deseas eliminar este criterio del catálogo operativo?")) return;
+            const tx = db.transaction(["tareas_dinamicas"], "readwrite");
+            tx.objectStore("tareas_dinamicas").delete(id).onsuccess = function() {
+                filtrarCrudTareas();
+                actualizarTareasUI();
+            };
+        }
+
+        function limpiarFormCrud() {
+            document.getElementById("crud-edit-id").value = "";
+            document.getElementById("crud-desc-input").value = "";
+        }
+
         function renderizarAdminConfig() {
             document.getElementById("cfg-restaurante").value = localStorage.getItem("restaurante_nombre") || "Tacos y Montados FI-FÍ";
             document.getElementById("cfg-sucursal").value = localStorage.getItem("restaurante_sucursal") || "Matriz LocalStore";
+
             const tbody = document.getElementById("tabla-areas-config");
             tbody.innerHTML = "";
-            areasCatalogo.forEach((a, index) => {
+            areasCatalogo.forEach((a, idx) => {
                 let tr = document.createElement("tr");
-                tr.className = "border-b";
-                tr.innerHTML = `<td class="p-3 text-sm font-medium text-gray-800">${a.nombre}</td><td class="p-3"><input type="checkbox" ${a.requiereFoto ? 'checked' : ''} onchange="cambiarFotoConfig(${index}, this.checked)"> Habilitar</td>`;
+                tr.className = "border-b border-slate-100";
+                tr.innerHTML = `<td class="p-3 font-semibold text-slate-800 capitalize">${a.nombre}</td><td class="p-3 text-right"><input type="checkbox" ${a.requiereFoto ? 'checked' : ''} onchange="cambiarFotoConfig(${idx}, this.checked)" class="rounded border-slate-300 text-slate-900 focus:ring-slate-900"> Habilitada</td>`;
                 tbody.appendChild(tr);
             });
+            filtrarCrudTareas();
         }
 
-        function cambiarFotoConfig(index, checked) {
-            areasCatalogo[index].requiereFoto = checked;
+        function cambiarFotoConfig(idx, checked) {
+            areasCatalogo[idx].requiereFoto = checked;
             const tx = db.transaction(["configuracion"], "readwrite");
-            tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }).onsuccess = function() { inicializarCombosUI(); };
+            tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }).onsuccess = function() {
+                inicializarCombosUI();
+            };
         }
 
         function guardarConfigSucursal() {
@@ -501,10 +796,11 @@
             const suc = document.getElementById("cfg-sucursal").value;
             localStorage.setItem("restaurante_nombre", nom);
             localStorage.setItem("restaurante_sucursal", suc);
-            document.getElementById("header-title").innerText = nom + " - " + suc;
-            alert("Información de establecimiento actualizada.");
+            document.getElementById("header-title").innerText = nom + " — " + suc;
+            alert("Unidad de negocio guardada localmente.");
         }
 
+        // --- EXPORTACIÓN Y REINICIO OBLIGATORIO ---
         function downloadPDFAndReset() {
             const tx = db.transaction(["checklists"], "readonly");
             let logs = [];
@@ -512,45 +808,47 @@
                 let cursor = e.target.result;
                 if (cursor) { logs.push(cursor.value); cursor.continue(); }
                 else {
-                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
-                    const downloadAnchor = document.createElement('a');
-                    downloadAnchor.setAttribute("href", dataStr);
-                    downloadAnchor.setAttribute("download", `AUDITORIA_SEMANAL_${new Date().toISOString().split('T')[0]}.json`);
-                    document.body.appendChild(downloadAnchor);
-                    downloadAnchor.click();
-                    downloadAnchor.remove();
-                    ejecutarLimpiezaAbsolutaCiclo();
+                    const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
+                    const a = document.createElement('a');
+                    a.setAttribute("href", str);
+                    a.setAttribute("download", `PRO26_AUDITORIA_AGUSTIN_${new Date().toISOString().split('T')[0]}.json`);
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    ejecutarLimpiezaCiclo();
                 }
             };
         }
 
-        function ejecutarLimpiezaAbsolutaCiclo() {
+        function ejecutarLimpiezaCiclo() {
             const tx = db.transaction(["checklists", "configuracion"], "readwrite");
             tx.objectStore("checklists").clear();
             const hoy = new Date().toISOString().split('T')[0];
             tx.objectStore("configuracion").put({ id: "ciclo_inicio", fecha: hoy }).onsuccess = function() {
-                alert("🚨 Ciclo reseteado con éxito.");
+                alert("🚨 El sistema se ha reiniciado correctamente para la nueva semana de operaciones.");
                 location.reload();
             };
         }
 
+        // --- MÓDULO DE COSTOS ---
         function calcularPrecioSugerido() {
-            const costo = parseFloat(document.getElementById("calc-costo").value);
+            const cost = parseFloat(document.getElementById("calc-costo").value);
             const pct = parseFloat(document.getElementById("calc-pct").value);
-            if (costo && pct) {
-                const sugerido = costo / pct;
-                document.getElementById("calc-resultado").innerText = `Precio Sugerido Venta: $${sugerido.toFixed(2)}`;
-            } else { document.getElementById("calc-resultado").innerText = "Ingrese datos válidos."; }
+            if (cost && pct) {
+                document.getElementById("calc-resultado").innerText = `Precio de Venta Sugerido: $${(cost / pct).toFixed(2)}`;
+            } else { document.getElementById("calc-resultado").innerText = "Valores inválidos."; }
         }
 
         function agregarMermaLocal() {
             const insumo = document.getElementById("merma-insumo").value.trim();
             const costo = parseFloat(document.getElementById("merma-costo").value);
             const motivo = document.getElementById("merma-motivo").value.trim();
-            if (!insumo || isNaN(costo)) return alert("Complete los campos de la merma.");
-            const nuevaMerma = { insumo, costo, motivo, fecha: new Date().toISOString().split('T')[0] };
+
+            if (!insumo || isNaN(costo)) return alert("Rellene los campos de la merma económica.");
+
+            const nMerma = { insumo, costo, motivo, fecha: new Date().toISOString().split('T')[0] };
             const tx = db.transaction(["mermas"], "readwrite");
-            tx.objectStore("mermas").add(nuevaMerma).onsuccess = function() {
+            tx.objectStore("mermas").add(nMerma).onsuccess = function() {
                 document.getElementById("merma-insumo").value = "";
                 document.getElementById("merma-costo").value = "";
                 document.getElementById("merma-motivo").value = "";
@@ -566,8 +864,8 @@
                 let cursor = e.target.result;
                 if (cursor) {
                     let li = document.createElement("li");
-                    li.className = "bg-gray-50 p-2 rounded text-slate-700 border-l-2 border-red-500";
-                    li.innerHTML = `📅 ${cursor.value.fecha} - <b>${cursor.value.insumo}</b>: Pérdida $${cursor.value.costo} (${cursor.value.motivo})`;
+                    li.className = "bg-slate-50 p-2.5 rounded-lg border-l-4 border-rose-500 font-medium text-slate-700 flex justify-between";
+                    li.innerHTML = `<span>📅 ${cursor.value.fecha} — <b>${cursor.value.insumo}</b> (${cursor.value.motivo})</span> <span class="text-rose-600">-$${cursor.value.costo}</span>`;
                     lista.appendChild(li);
                     cursor.continue();
                 }
@@ -576,9 +874,9 @@
 
         window.onload = function() {
             initDB();
-            const localNom = localStorage.getItem("restaurante_nombre");
-            const localSuc = localStorage.getItem("restaurante_sucursal");
-            if (localNom && localSuc) { document.getElementById("header-title").innerText = localNom + " - " + localSuc; }
+            const n = localStorage.getItem("restaurante_nombre");
+            const s = localStorage.getItem("restaurante_sucursal");
+            if (n && s) { document.getElementById("header-title").innerText = n + " — " + s; }
         };
     </script>
 </body>
