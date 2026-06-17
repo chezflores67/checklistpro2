@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Checklists Profesional - Restaurante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <div id="weekly-lock-banner" class="hidden bg-red-600 text-white p-4 text-center font-bold sticky top-0 z-50 animate-pulse shadow-lg">
+        ⚠️ EL CICLO SEMANAL HA CONCLUIDO. La aplicación está bloqueada. Descarga el reporte PDF para reiniciar el sistema.
+        <button onclick="downloadPDFAndReset()" class="ml-4 bg-white text-red-700 px-4 py-1 rounded hover:bg-gray-100 transition">Descargar PDF y Resetear</button>
+    </div>
+
+    <header class="bg-slate-800 text-white p-4 shadow-md flex justify-between items-center">
+        <div>
+            <h1 id="header-title" class="text-xl font-bold">Control Gastronómico Local</h1>
+            <p class="text-xs text-gray-400">Modo Local Store Activo (IndexedDB)</p>
+        </div>
+        <div class="flex items-center space-x-2 bg-slate-700 px-3 py-1.5 rounded text-sm">
+            <span>📅 Ciclo iniciado:</span>
+            <span id="cycle-start-date" class="font-semibold text-green-400">Cargando...</span>
+        </div>
+    </header>
+
+    <nav class="bg-white border-b border-gray-200 flex overflow-x-auto">
+        <button onclick="switchTab('tab-checklist')" class="tab-btn px-6 py-3 font-semibold text-sm border-b-2 border-blue-600 text-blue-600 whitespace-nowrap" id="btn-tab-checklist">📋 Levantar Checklist</button>
+        <button onclick="switchTab('tab-supervisor')" class="tab-btn px-6 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-600 hover:text-blue-600 whitespace-nowrap" id="btn-tab-supervisor">🛡️ Supervisor</button>
+        <button onclick="switchTab('tab-admin')" class="tab-btn px-6 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-600 hover:text-blue-600 whitespace-nowrap" id="btn-tab-admin">⚙️ Configuración</button>
+        <button onclick="switchTab('tab-finanzas')" class="tab-btn px-6 py-3 font-semibold text-sm border-b-2 border-transparent text-gray-600 hover:text-blue-600 whitespace-nowrap" id="btn-tab-finanzas">💰 Finanzas y Recetas</button>
+    </nav>
+
+    <main class="flex-1 p-4 max-w-5xl w-full mx-auto">
+
+        <section id="tab-checklist" class="tab-content active space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-bold mb-4 border-b pb-2 text-slate-700">📋 Formulario de Turno y Operación</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Turno de Trabajo *</label>
+                        <select id="op-turno" class="w-full p-2 border rounded bg-white" onchange="actualizarTareasUI()">
+                            <option value="matutino">☀️ Matutino</option>
+                            <option value="vespertino">⛅ Vespertino</option>
+                            <option value="nocturno">🌙 Nocturno (24 hrs)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Área / Sección *</label>
+                        <select id="op-area" class="w-full p-2 border rounded bg-white" onchange="actualizarTareasUI()"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Tipo de Checklist *</label>
+                        <select id="op-tipo" class="w-full p-2 border rounded bg-white" onchange="actualizarTareasUI()">
+                            <option value="apertura">🟢 Apertura de Turno</option>
+                            <option value="cierre">🔴 Cierre de Turno</option>
+                            <option value="express">⚡ Express (Falta de tiempo)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nombre del Operativo *</label>
+                        <input type="text" id="op-empleado" class="w-full p-2 border rounded" placeholder="Ej. Juan Parrilla">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="text-lg font-bold text-slate-700">Puntos a Evaluar</h3>
+                    <div id="photo-counter-badge" class="hidden text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">
+                        Fotos capturadas: <span id="photo-count">0</span> / 3 máx.
+                    </div>
+                </div>
+                <div id="tareas-container" class="space-y-4 divide-y divide-gray-100"></div>
+                <div class="mt-6 pt-4 border-t flex justify-end">
+                    <button onclick="guardarChecklist()" id="btn-save-checklist" class="bg-blue-600 text-white px-6 py-2.5 rounded shadow hover:bg-blue-700 font-medium transition">Enviar a Revisión de Supervisor</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-supervisor" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-bold mb-2 text-slate-700">🛡️ Checklists Pendientes de Validación</h2>
+                <div id="lista-pendientes" class="space-y-4"></div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-bold mb-2 text-slate-700">📚 Historial Semanal (Aprobados)</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 border-b">
+                                <th class="p-3 font-semibold">Fecha/Hora</th>
+                                <th class="p-3 font-semibold">Área</th>
+                                <th class="p-3 font-semibold">Turno/Tipo</th>
+                                <th class="p-3 font-semibold">Personal</th>
+                                <th class="p-3 font-semibold">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-historial" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-admin" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-bold mb-4 text-slate-700">🏢 Datos de la Sucursal Local</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nombre Comercial del Restaurante</label>
+                        <input type="text" id="cfg-restaurante" class="w-full p-2 border rounded" value="Tacos y Montados FI-FÍ">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Sucursal / Identificador</label>
+                        <input type="text" id="cfg-sucursal" class="w-full p-2 border rounded" value="Matriz LocalStore">
+                    </div>
+                </div>
+                <button onclick="guardarConfigSucursal()" class="mt-4 bg-slate-800 text-white px-4 py-2 rounded text-sm hover:bg-slate-700">Actualizar Datos</button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-bold mb-4 text-slate-700">📍 Control de Áreas y Evidencias Fotográficas</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 border-b">
+                                <th class="p-3 font-semibold">Área</th>
+                                <th class="p-3 font-semibold">Habilitar Foto de Evidencia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-areas-config" class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-finanzas" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-bold mb-2 text-slate-700">🍹 Costeo de Recetas / Tragos (Mark In)</h2>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-gray-50 rounded border text-xs space-y-1">
+                            <span class="font-bold text-slate-700 block">Ejemplo Base: Cóctel Negroni</span>
+                            <p>• Gin (1 oz): $0.74 | • Vermouth (1 oz): $0.30 | • Campari (1 oz): $1.14</p>
+                            <p class="font-semibold text-blue-700 pt-1">Costo Insumos Total: $2.19 | Precio Sugerido (Cost 22%): $9.99</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Calculadora Express de Precio</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="calc-costo" placeholder="Costo Receta ($)" class="p-2 border rounded text-sm">
+                            <input type="number" id="calc-pct" placeholder="Porcentaje Costo (ej. 0.22)" class="p-2 border rounded text-sm">
+                        </div>
+                        <button onclick="calcularPrecioSugerido()" class="w-full bg-emerald-600 text-white p-2 text-xs font-bold rounded hover:bg-emerald-700">Calcular Precio Venta Sugerido</button>
+                        <p id="calc-resultado" class="text-sm font-bold text-center text-emerald-700"></p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-bold mb-2 text-slate-700">📉 Registro y Control de Mermas</h2>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="merma-insumo" placeholder="Insumo" class="p-2 border rounded text-sm">
+                            <input type="number" id="merma-costo" placeholder="Costo Pérdida ($)" class="p-2 border rounded text-sm">
+                        </div>
+                        <input type="text" id="merma-motivo" placeholder="Motivo de la merma" class="p-2 border rounded text-sm w-full">
+                        <button onclick="agregarMermaLocal()" class="w-full bg-slate-800 text-white p-2 text-xs font-bold rounded hover:bg-slate-900">Registrar Pérdida Económica</button>
+                    </div>
+                    <div class="mt-4 max-h-40 overflow-y-auto border-t pt-2">
+                        <ul id="lista-mermas" class="text-xs divide-y space-y-1"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-gray-400 text-center py-3 text-xs border-t border-slate-700 mt-auto">
+        <p>© 2026 Sistema Local Multiturno para Restaurantes de 24 Horas. Todo guardado en IndexedDB Local.</p>
+    </footer>
+
+    <script>
+        let db;
+        const DB_NAME = "RestauranteAppDB";
+        const DB_VERSION = 1;
+
+        const TAREAS_SEMILLA = [
+            { id: 1, area: "cocina", desc: "Las estufas, parrillas y plancha quedan limpias, sin residuos de comida ni grasa", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 2, area: "cocina", desc: "Todos los alimentos quedan bien tapados en refrigeradores o almacén repisas", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 3, area: "cocina", desc: "Verificar que todo el producto se encuentre etiquetado bajo sistema PEPS", tipos: ["apertura","express"], turnos: ["matutino","vespertino"] },
+            { id: 4, area: "parrilla", desc: "Realizar el lavado de manos y firmar planilla de técnica de limpieza", tipos: ["apertura","cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 5, area: "parrilla", desc: "Verificar llave de gas cerrada y extractores apagados", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 6, area: "meseros", desc: "Mesa montada: Centro de mesa, salsas, cubiertos en orden y posición", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 7, area: "caja", desc: "Validación de fondo de caja y arqueo inicial de turno", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 8, area: "salon", desc: "Limpieza profunda de pisos, cristales y estaciones de servicio", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] }
+        ];
+
+        let areasCatalogo = [
+            { id: "cocina", nombre: "Cocina", requiereFoto: true },
+            { id: "parrilla", nombre: "Parrilla FI-FÍ", requiereFoto: true },
+            { id: "meseros", nombre: "Servicio Meseros", requiereFoto: false },
+            { id: "barra", nombre: "Barra", requiereFoto: false },
+            { id: "caja", nombre: "Caja", requiereFoto: false },
+            { id: "salon", nombre: "Limpieza de Salón", requiereFoto: false },
+            { id: "almacen", nombre: "Almacén", requiereFoto: false }
+        ];
+
+        let fotosCargadasEnChecklistActual = 0;
+
+        function initDB() {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = function(event) { console.error("Error IndexedDB:", event.target.error); };
+            request.onupgradeneeded = function(event) {
+                db = event.target.result;
+                if (!db.objectStoreNames.contains("configuracion")) { db.createObjectStore("configuracion", { keyPath: "id" }); }
+                if (!db.objectStoreNames.contains("checklists")) { db.createObjectStore("checklists", { keyPath: "id", autoIncrement: true }); }
+                if (!db.objectStoreNames.contains("mermas")) { db.createObjectStore("mermas", { keyPath: "id", autoIncrement: true }); }
+            };
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                verificarCicloSemanalYConfiguracion();
+            };
+        }
+
+        function verificarCicloSemanalYConfiguracion() {
+            const tx = db.transaction(["configuracion"], "readwrite");
+            const store = tx.objectStore("configuracion");
+            store.get("ciclo_inicio").onsuccess = function(e) {
+                if (!e.target.result) {
+                    const hoy = new Date().toISOString().split('T')[0];
+                    store.put({ id: "ciclo_inicio", fecha: hoy });
+                    document.getElementById("cycle-start-date").innerText = hoy;
+                } else {
+                    document.getElementById("cycle-start-date").innerText = e.target.result.fecha;
+                    comprobarBloqueoFechas(e.target.result.fecha);
+                }
+            };
+            store.get("areas_lista").onsuccess = function(e) {
+                if (!e.target.result) { store.put({ id: "areas_lista", datos: areasCatalogo }); }
+                else { areasCatalogo = e.target.result.datos; }
+                inicializarCombosUI();
+            };
+        }
+
+        function comprobarBloqueoFechas(fechaInicioStr) {
+            const inicio = new Date(fechaInicioStr);
+            const hoy = new Date();
+            const diffTime = Math.abs(hoy - inicio);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays >= 7) {
+                document.getElementById("weekly-lock-banner").classList.remove("hidden");
+                document.getElementById("btn-save-checklist").disabled = true;
+                document.getElementById("btn-save-checklist").innerText = "SISTEMA BLOQUEADO - EXPORTAR PDF";
+                document.getElementById("btn-save-checklist").classList.replace("bg-blue-600", "bg-gray-400");
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.replace('border-blue-600', 'border-transparent'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.replace('text-blue-600', 'text-gray-600'));
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.replace('border-transparent', 'border-blue-600');
+            document.getElementById('btn-' + tabId).classList.replace('text-gray-600', 'text-blue-600');
+            if (tabId === 'tab-supervisor') renderizarSupervisor();
+            if (tabId === 'tab-admin') renderizarAdminConfig();
+            if (tabId === 'tab-finanzas') renderizarMermas();
+        }
+
+        function inicializarCombosUI() {
+            const selectArea = document.getElementById("op-area");
+            selectArea.innerHTML = "";
+            areasCatalogo.forEach(a => {
+                let opt = document.createElement("option");
+                opt.value = a.id;
+                opt.innerText = a.nombre;
+                selectArea.appendChild(opt);
+            });
+            actualizarTareasUI();
+        }
+
+        function actualizarTareasUI() {
+            const areaSel = document.getElementById("op-area").value;
+            const turnoSel = document.getElementById("op-turno").value;
+            const tipoSel = document.getElementById("op-tipo").value;
+            const contenedor = document.getElementById("tareas-container");
+            contenedor.innerHTML = "";
+            fotosCargadasEnChecklistActual = 0;
+            actualizarContadorFotosUI();
+            const areaConfig = areasCatalogo.find(a => a.id === areaSel);
+            const requiereFotoArea = areaConfig ? areaConfig.requiresFoto || areaConfig.requiereFoto : false;
+            if (requiereFotoArea) { document.getElementById("photo-counter-badge").classList.remove("hidden"); }
+            else { document.getElementById("photo-counter-badge").classList.add("hidden"); }
+            const tareasFiltradas = TAREAS_SEMILLA.filter(t => t.area === areaSel && t.tipos.includes(tipoSel) && t.turnos.includes(turnoSel));
+            if (tareasFiltradas.length === 0) {
+                contenedor.innerHTML = `<p class="text-sm text-gray-500 italic p-4 text-center">No hay tareas específicas preconfiguradas para esta sección en este turno. Puede enviar la lista como validada.</p>`;
+                return;
+            }
+            tareasFiltradas.forEach(t => {
+                let itemDiv = document.createElement("div");
+                itemDiv.className = "pt-4 first:pt-0 space-y-3";
+                itemDiv.innerHTML = `
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                        <p class="text-sm font-medium text-gray-700 max-w-xl">${t.desc}</p>
+                        <div class="flex items-center space-x-4">
+                            <label class="flex items-center space-x-1 cursor-pointer">
+                                <input type="radio" name="status-${t.id}" value="SI" checked class="text-green-600 focus:ring-green-500" onclick="toggleCamposViolacion(${t.id}, false)">
+                                <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">CUMPLE</span>
+                            </label>
+                            <label class="flex items-center space-x-1 cursor-pointer">
+                                <input type="radio" name="status-${t.id}" value="NO" class="text-red-600 focus:ring-red-500" onclick="toggleCamposViolacion(${t.id}, true)">
+                                <span class="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded">VIOLACIÓN</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="block-violacion-${t.id}" class="hidden bg-red-50 p-3 rounded-md border border-red-100 space-y-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-red-700 mb-1">Describa la Violación Detectada *</label>
+                                <input type="text" id="input-violacion-${t.id}" class="w-full p-2 border border-red-200 rounded text-xs bg-white" placeholder="Ej. Cochambre acumulado en quemador">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-emerald-700 mb-1">Acción Correctiva Inmediata *</label>
+                                <input type="text" id="input-correccion-${t.id}" class="w-full p-2 border border-emerald-200 rounded text-xs bg-white" placeholder="Ej. Se aplicó desengrasante">
+                            </div>
+                        </div>
+                        ${requiereFotoArea ? `
+                        <div class="pt-2">
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Foto de Evidencia (Máximo 3 por turno global)</label>
+                            <input type="file" accept="image/*" id="foto-${t.id}" onchange="procesarFotoBase64(${t.id})" class="text-xs block w-full text-slate-500">
+                            <input type="hidden" id="hidden-b64-${t.id}">
+                        </div>` : ''}
+                    </div>`;
+                contenedor.appendChild(itemDiv);
+            });
+        }
+
+        function toggleCamposViolacion(id, mostrar) {
+            const div = document.getElementById(`block-violacion-${id}`);
+            if (mostrar) { div.classList.remove("hidden"); }
+            else {
+                div.classList.add("hidden");
+                const hiddenInput = document.getElementById(`hidden-b64-${id}`);
+                if (hiddenInput && hiddenInput.value) {
+                    hiddenInput.value = "";
+                    fotosCargadasEnChecklistActual--;
+                    actualizarContadorFotosUI();
+                }
+            }
+        }
+
+        function procesarFotoBase64(id) {
+            const fileInput = document.getElementById(`foto-${id}`);
+            if (fotosCargadasEnChecklistActual >= 3) {
+                alert("Límite alcanzado: Máximo 3 fotos de evidencia por checklist.");
+                fileInput.value = "";
+                return;
+            }
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(`hidden-b64-${id}`).value = e.target.result;
+                    fotosCargadasEnChecklistActual++;
+                    actualizarContadorFotosUI();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function actualizarContadorFotosUI() {
+            const countSpan = document.getElementById("photo-count");
+            if (countSpan) countSpan.innerText = fotosCargadasEnChecklistActual;
+        }
+
+        function guardarChecklist() {
+            const empleado = document.getElementById("op-empleado").value.trim();
+            if (!empleado) { return alert("Por favor complete el nombre del empleado operativo."); }
+            const areaSel = document.getElementById("op-area").value;
+            const turnoSel = document.getElementById("op-turno").value;
+            const tipoSel = document.getElementById("op-tipo").value;
+            const tareasFiltradas = TAREAS_SEMILLA.filter(t => t.area === areaSel && t.tipos.includes(tipoSel) && t.turnos.includes(turnoSel));
+            let respuestas = [];
+            let validacionCorrecta = true;
+            tareasFiltradas.forEach(t => {
+                const cumpleRadio = document.querySelector(`input[name="status-${t.id}"]:checked`).value;
+                let itemResp = { tarea_id: t.id, desc: t.desc, cumple: cumpleRadio === "SI" };
+                if (cumpleRadio === "NO") {
+                    const violacion = document.getElementById(`input-violacion-${t.id}`).value.trim();
+                    const correccion = document.getElementById(`input-correccion-${t.id}`).value.trim();
+                    if (!violacion || !correccion) { validacionCorrecta = false; }
+                    itemResp.violacion = violacion;
+                    itemResp.correccion = correccion;
+                    const fotoInput = document.getElementById(`hidden-b64-${t.id}`);
+                    if (fotoInput && fotoInput.value) { itemResp.foto = fotoInput.value; }
+                }
+                respuestas.push(itemResp);
+            });
+            if (!validacionCorrecta) { return alert("Debe detallar la descripción de la falla y su corrección obligatoriamente."); }
+            const nuevoChecklist = {
+                fecha: new Date().toISOString().split('T')[0],
+                hora: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                area: areaSel,
+                turno: turnoSel,
+                tipo: tipoSel,
+                empleado: empleado,
+                estado: "pendiente_supervisor",
+                supervisor: "",
+                respuestas: respuestas
+            };
+            const tx = db.transaction(["checklists"], "readwrite");
+            tx.objectStore("checklists").add(nuevoChecklist).onsuccess = function() {
+                alert("✅ ¡Checklist enviado con éxito al supervisor!");
+                document.getElementById("op-empleado").value = "";
+                actualizarTareasUI();
+            };
+        }
+
+        function renderizarSupervisor() {
+            const divPendientes = document.getElementById("lista-pendientes");
+            const tablaHistorial = document.getElementById("tabla-historial");
+            divPendientes.innerHTML = "";
+            tablaHistorial.innerHTML = "";
+            const tx = db.transaction(["checklists"], "readonly");
+            tx.objectStore("checklists").openCursor().onsuccess = function(event) {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const item = cursor.value;
+                    if (item.estado === "pendiente_supervisor") {
+                        let card = document.createElement("div");
+                        card.className = "p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3 shadow-sm";
+                        let violacionesCount = item.respuestas.filter(r => !r.cumple).length;
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs uppercase font-bold bg-amber-200 px-2 py-0.5 rounded">${item.turno} | ${item.tipo}</span>
+                                    <h4 class="font-bold text-slate-800 text-sm mt-1">Área: <span class="capitalize">${item.area}</span></h4>
+                                    <p class="text-xs text-gray-600">Levantado por: <b>${item.empleado}</b> a las ${item.hora} hrs</p>
+                                </div>
+                                <span class="text-xs font-bold text-red-700">${violacionesCount} Violación(es)</span>
+                            </div>
+                            <div class="space-y-1 pl-2 border-l-2 border-amber-300 text-xs text-gray-700">
+                                ${item.respuestas.map(r => `<p>• ${r.desc}: ${r.cumple ? '🟢 OK' : `🔴 Falla: ${r.violacion} | Corr: ${r.correccion}`}</p>`).join('')}
+                            </div>
+                            <div class="flex items-center space-x-2 pt-2 border-t">
+                                <input type="text" id="super-name-${cursor.key}" placeholder="Nombre de Supervisor" class="p-1.5 text-xs border rounded bg-white">
+                                <button onclick="autorizarChecklist(${cursor.key})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-bold">Validar y Firmar</button>
+                            </div>`;
+                        divPendientes.appendChild(card);
+                    } else {
+                        let fila = document.createElement("tr");
+                        fila.className = "border-b hover:bg-gray-50";
+                        fila.innerHTML = `<td class="p-3 text-xs">${item.fecha} ${item.hora}</td><td class="p-3 text-xs font-bold capitalize">${item.area}</td><td class="p-3 text-xs">${item.turno} / ${item.tipo}</td><td class="p-3 text-xs">Op: ${item.empleado}<br><span class="text-gray-500 text-[10px]">Sup: ${item.supervisor}</span></td><td class="p-3 text-xs text-green-600 font-bold">✓ Revisado</td>`;
+                        tablaHistorial.appendChild(fila);
+                    }
+                    cursor.continue();
+                } else {
+                    if (divPendientes.innerHTML === "") { divPendientes.innerHTML = `<p class="text-sm text-gray-500 italic py-4 text-center">No hay listas operativas esperando firmas.</p>`; }
+                }
+            };
+        }
+
+        function autorizarChecklist(id) {
+            const supName = document.getElementById(`super-name-${id}`).value.trim();
+            if (!supName) return alert("Debe escribir su nombre como supervisor para autorizar.");
+            const tx = db.transaction(["checklists"], "readwrite");
+            const store = tx.objectStore("checklists");
+            store.get(id).onsuccess = function(e) {
+                let data = e.target.result;
+                data.estado = "aprobado";
+                data.supervisor = supName;
+                store.put(data).onsuccess = function() {
+                    alert("Lista archivada en el ciclo semanal.");
+                    renderizarSupervisor();
+                };
+            };
+        }
+
+        function renderizarAdminConfig() {
+            document.getElementById("cfg-restaurante").value = localStorage.getItem("restaurante_nombre") || "Tacos y Montados FI-FÍ";
+            document.getElementById("cfg-sucursal").value = localStorage.getItem("restaurante_sucursal") || "Matriz LocalStore";
+            const tbody = document.getElementById("tabla-areas-config");
+            tbody.innerHTML = "";
+            areasCatalogo.forEach((a, index) => {
+                let tr = document.createElement("tr");
+                tr.className = "border-b";
+                tr.innerHTML = `<td class="p-3 text-sm font-medium text-gray-800">${a.nombre}</td><td class="p-3"><input type="checkbox" ${a.requiereFoto ? 'checked' : ''} onchange="cambiarFotoConfig(${index}, this.checked)"> Habilitar</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function cambiarFotoConfig(index, checked) {
+            areasCatalogo[index].requiereFoto = checked;
+            const tx = db.transaction(["configuracion"], "readwrite");
+            tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }).onsuccess = function() { inicializarCombosUI(); };
+        }
+
+        function guardarConfigSucursal() {
+            const nom = document.getElementById("cfg-restaurante").value;
+            const suc = document.getElementById("cfg-sucursal").value;
+            localStorage.setItem("restaurante_nombre", nom);
+            localStorage.setItem("restaurante_sucursal", suc);
+            document.getElementById("header-title").innerText = nom + " - " + suc;
+            alert("Información de establecimiento actualizada.");
+        }
+
+        function downloadPDFAndReset() {
+            const tx = db.transaction(["checklists"], "readonly");
+            let logs = [];
+            tx.objectStore("checklists").openCursor().onsuccess = function(e) {
+                let cursor = e.target.result;
+                if (cursor) { logs.push(cursor.value); cursor.continue(); }
+                else {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
+                    const downloadAnchor = document.createElement('a');
+                    downloadAnchor.setAttribute("href", dataStr);
+                    downloadAnchor.setAttribute("download", `AUDITORIA_SEMANAL_${new Date().toISOString().split('T')[0]}.json`);
+                    document.body.appendChild(downloadAnchor);
+                    downloadAnchor.click();
+                    downloadAnchor.remove();
+                    ejecutarLimpiezaAbsolutaCiclo();
+                }
+            };
+        }
+
+        function ejecutarLimpiezaAbsolutaCiclo() {
+            const tx = db.transaction(["checklists", "configuracion"], "readwrite");
+            tx.objectStore("checklists").clear();
+            const hoy = new Date().toISOString().split('T')[0];
+            tx.objectStore("configuracion").put({ id: "ciclo_inicio", fecha: hoy }).onsuccess = function() {
+                alert("🚨 Ciclo reseteado con éxito.");
+                location.reload();
+            };
+        }
+
+        function calcularPrecioSugerido() {
+            const costo = parseFloat(document.getElementById("calc-costo").value);
+            const pct = parseFloat(document.getElementById("calc-pct").value);
+            if (costo && pct) {
+                const sugerido = costo / pct;
+                document.getElementById("calc-resultado").innerText = `Precio Sugerido Venta: $${sugerido.toFixed(2)}`;
+            } else { document.getElementById("calc-resultado").innerText = "Ingrese datos válidos."; }
+        }
+
+        function agregarMermaLocal() {
+            const insumo = document.getElementById("merma-insumo").value.trim();
+            const costo = parseFloat(document.getElementById("merma-costo").value);
+            const motivo = document.getElementById("merma-motivo").value.trim();
+            if (!insumo || isNaN(costo)) return alert("Complete los campos de la merma.");
+            const nuevaMerma = { insumo, costo, motivo, fecha: new Date().toISOString().split('T')[0] };
+            const tx = db.transaction(["mermas"], "readwrite");
+            tx.objectStore("mermas").add(nuevaMerma).onsuccess = function() {
+                document.getElementById("merma-insumo").value = "";
+                document.getElementById("merma-costo").value = "";
+                document.getElementById("merma-motivo").value = "";
+                renderizarMermas();
+            };
+        }
+
+        function renderizarMermas() {
+            const lista = document.getElementById("lista-mermas");
+            lista.innerHTML = "";
+            const tx = db.transaction(["mermas"], "readonly");
+            tx.objectStore("mermas").openCursor().onsuccess = function(e) {
+                let cursor = e.target.result;
+                if (cursor) {
+                    let li = document.createElement("li");
+                    li.className = "bg-gray-50 p-2 rounded text-slate-700 border-l-2 border-red-500";
+                    li.innerHTML = `📅 ${cursor.value.fecha} - <b>${cursor.value.insumo}</b>: Pérdida $${cursor.value.costo} (${cursor.value.motivo})`;
+                    lista.appendChild(li);
+                    cursor.continue();
+                }
+            };
+        }
+
+        window.onload = function() {
+            initDB();
+            const localNom = localStorage.getItem("restaurante_nombre");
+            const localSuc = localStorage.getItem("restaurante_sucursal");
+            if (localNom && localSuc) { document.getElementById("header-title").innerText = localNom + " - " + localSuc; }
+        };
+    </script>
+</body>
+</html>
