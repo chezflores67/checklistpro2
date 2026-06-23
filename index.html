@@ -73,7 +73,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">Turno Laboral</label>
-                        <select id="op-turno" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()">
+                        <select id="op-turno" class="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()">
                             <option value="matutino">☀️ Matutino</option>
                             <option value="vespertino">⛅ Vespertino</option>
                             <option value="nocturno">🌙 Nocturno (24 Hrs)</option>
@@ -81,11 +81,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">Área Operativa</label>
-                        <select id="op-area" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()"></select>
+                        <select id="op-area" class="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()"></select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">Tipo de Formato</label>
-                        <select id="op-tipo" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()">
+                        <select id="op-tipo" class="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" onchange="actualizarTareasUI()">
                             <option value="apertura">Apertura / Inicio</option>
                             <option value="cierre">Cierre / Entrega</option>
                             <option value="express">Falta de tiempo (Express)</option>
@@ -93,7 +93,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre del Operativo</label>
-                        <input type="text" id="op-empleado" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" placeholder="Ej. Juan Parrilla">
+                        <select id="op-empleado" class="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none"></select>
                     </div>
                 </div>
             </div>
@@ -118,8 +118,8 @@
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                 <h2 class="text-base font-bold text-slate-900">🛡️ Autorización y Control de Turno</h2>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre del Supervisor en Turno (Obligatorio para Firmar)</label>
-                    <input type="text" id="supervisor-signature" class="w-full sm:w-80 p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none font-medium" placeholder="Ej. Chef Agustín">
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Seleccione Supervisor en Turno (Obligatorio para Firmar)</label>
+                    <select id="supervisor-signature" class="w-full sm:w-80 p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none font-medium"></select>
                 </div>
             </div>
 
@@ -194,48 +194,84 @@
         </section>
 
         <section id="tab-admin" class="tab-content space-y-6">
+            
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-base font-bold text-slate-900">🏢 Datos de la Unidad de Negocio</h2>
+                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">🏢 1. Identificación de la Sucursal</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre Comercial</label>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre del Restaurante</label>
                         <input type="text" id="cfg-restaurante" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" value="Tacos y Montados FI-FÍ">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">Identificador de Sucursal</label>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Identificador / Sucursal</label>
                         <input type="text" id="cfg-sucursal" class="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none" value="Matriz LocalStore">
                     </div>
                 </div>
-                <button onclick="guardarConfigSucursal()" class="bg-slate-950 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-medium transition">Actualizar Establecimiento</button>
+                <button onclick="guardarConfigSucursal()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-medium transition">Actualizar Sucursal</button>
             </div>
 
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-base font-bold text-slate-900">🗂️ CRUD: Control de Áreas Operativas</h2>
+                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">👥 2. Registro de Colaboradores y Plantilla</h2>
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Nombre de la Nueva Área</label>
-                            <input type="hidden" id="crud-area-idx" value="">
-                            <input type="text" id="crud-area-nombre" placeholder="Ej. Barra de Bebidas" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre Completo</label>
+                            <input type="hidden" id="crud-user-id" value="">
+                            <input type="text" id="crud-user-nombre" placeholder="Ej. Carlos Mendoza" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none">
                         </div>
-                        <div class="flex items-end pb-2">
-                            <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-                                <input type="checkbox" id="crud-area-foto" class="rounded text-slate-950 focus:ring-slate-900">
-                                Exigir Cámara de Evidencia (Máx 3)
-                            </label>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Rol Operativo</label>
+                            <select id="crud-user-rol" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none">
+                                <option value="operativo">Operativo (Parrillero, Cocinero, Mesero)</option>
+                                <option value="supervisor">Supervisor (Chef, Gerente, Jefe de Turno)</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="flex justify-end gap-2">
-                        <button onclick="limpiarFormArea()" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium">Limpiar</button>
-                        <button onclick="guardarAreaOperativa()" class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-xs font-medium">Guardar Área</button>
+                        <div class="flex items-end">
+                            <button onclick="guardarColaborador()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 rounded-lg text-xs font-medium transition">Guardar Colaborador</button>
+                        </div>
                     </div>
                 </div>
                 <div class="overflow-x-auto border border-slate-100 rounded-lg">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
                             <tr>
-                                <th class="p-3">Nombre del Área</th>
-                                <th class="p-3">Cámara Requerida</th>
+                                <th class="p-3">Nombre Completo</th>
+                                <th class="p-3">Rol / Cargo</th>
+                                <th class="p-3 w-32 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crud-tabla-usuarios" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">🗂️ 3. Catálogo de Áreas Operativas</h2>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre del Área</label>
+                            <input type="hidden" id="crud-area-id-hidden" value="">
+                            <input type="text" id="crud-area-nombre" placeholder="Ej. Barra de Bebidas" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none">
+                        </div>
+                        <div class="pb-2">
+                            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                                <input type="checkbox" id="crud-area-foto" class="rounded text-slate-950 focus:ring-slate-900">
+                                Exigir Cámara de Evidencia
+                            </label>
+                        </div>
+                        <div>
+                            <button onclick="guardarAreaOperativa()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 rounded-lg text-xs font-medium transition">Guardar Área</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto border border-slate-100 rounded-lg">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Identificador Interno</th>
+                                <th class="p-3">Nombre Comercial del Área</th>
+                                <th class="p-3">Cámara Evidencia</th>
                                 <th class="p-3 w-32 text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -245,36 +281,36 @@
             </div>
 
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-base font-bold text-slate-900">📍 CRUD: Catálogo de Tareas Operativas</h2>
+                <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">📍 4. Criterios y Tareas de Verificación</h2>
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Área de Destino</label>
-                        <select id="crud-area" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none"></select>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Filtrar por Área</label>
+                        <select id="crud-tarea-area" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none"></select>
                     </div>
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-500 mb-1">Turno Aplicable</label>
-                        <select id="crud-turno" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none">
+                        <select id="crud-tarea-turno" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none">
                             <option value="matutino">Matutino</option>
                             <option value="vespertino">Vespertino</option>
                             <option value="nocturno">Nocturno</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Formato de Lista</label>
-                        <select id="crud-tipo" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Formato</label>
+                        <select id="crud-tarea-tipo" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none">
                             <option value="apertura">Apertura</option>
                             <option value="cierre">Cierre</option>
                             <option value="express">Express</option>
                         </select>
                     </div>
-                    <button onclick="filtrarCrudTareas()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 text-xs font-bold rounded-lg transition">Filtrar Tareas</button>
+                    <button onclick="filtrarCrudTareas()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 text-xs font-bold rounded-lg transition">Filtrar Catálogo</button>
                 </div>
 
                 <div class="space-y-2 border-t border-slate-100 pt-3">
-                    <label class="block text-xs font-bold text-slate-700">Formulario de Criterio Operativo</label>
+                    <label class="block text-xs font-bold text-slate-700">Formulario de Tarea (Escribe o edita el criterio seleccionado)</label>
                     <div class="flex gap-2">
                         <input type="hidden" id="crud-edit-id" value="">
-                        <input type="text" id="crud-desc-input" placeholder="Escribe la consigna o tarea para el personal..." class="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:outline-none">
+                        <input type="text" id="crud-desc-input" placeholder="Escribe la consigna operativa..." class="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:outline-none">
                         <button onclick="guardarPuntoInspeccion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Guardar Criterio</button>
                     </div>
                 </div>
@@ -300,7 +336,7 @@
 
     <script>
         let db;
-        const DB_NAME = "PRO26_DB_V2";
+        const DB_NAME = "PRO26_COMPLETO_DB";
         const DB_VERSION = 1;
         let pinAutenticado = false;
         let callbackConfirmacion = null;
@@ -310,7 +346,7 @@
             { id: 2, area: "cocina", desc: "El área de producción queda limpia y desinfectada", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 3, area: "cocina", desc: "Los pisos de toda la cocina quedan limpios, incluyendo detrás de estufas y refrigeradores", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 4, area: "cocina", desc: "Las paredes quedan limpias y libres de manchas o grasa", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 5, area: "cocina", desc: "Las tarjas quedan limpias y sin residuos de alimentos", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 5, area: "cocina", desc: "Las tarjas quedan limpias and sin residuos de alimentos", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 6, area: "cocina", desc: "Los platos quedan acomodados en su lugar o bien escurriéndose en el estante", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 7, area: "cocina", desc: "Las tapaderas quedan dentro de la caja correspondiente", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 8, area: "cocina", desc: "Los cubiertos quedan limpios y dentro de un recipiente todos juntos", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
@@ -325,7 +361,7 @@
             { id: 17, area: "cocina", desc: "Los trapeadores se lavan y quedan limpios después de utilizarlos", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 18, area: "cocina", desc: "Los trapos se dejan remojando en una cubeta con un poco de cloro", tipos: ["cierre"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 19, area: "cocina", desc: "Las estufas, parrillas y plancha quedan limpias, sin residuos de comida ni grasa", tipos: ["cierre","express"], turnos: ["matutino","vespertino","nocturno"] },
-            { id: 20, area: "parrilla", desc: "Portar uniforme completo: Filipina roja, playera fifi, pantalón negro, visera con red roja, mandil con logotipo, tenis negros y 3 plumas de click", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
+            { id: 20, area: "parrilla", desc: "Portar uniforme completo: Filipina roja, playera fifi, pantalón negro, visera con red roja, mandil con logotipo, tenis negros y 3 plumas", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 21, area: "parrilla", desc: "Registrar entrada mediante huella digital y realizar lavado de manos riguroso", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 22, area: "parrilla", desc: "Realizar el inventario inicial llenando la sección CONTROL DE PARRILLA", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
             { id: 23, area: "parrilla", desc: "Limpiar, lavar, enjuagar y desinfectar toda el área (barras, campana, temperador, refrigeradores, tapetes)", tipos: ["apertura"], turnos: ["matutino","vespertino","nocturno"] },
@@ -355,6 +391,15 @@
             { id: "almacen", nombre: "Almacén", requiereFoto: false }
         ];
 
+        let colaboradoresCatalogo = [
+            { id: 1, nombre: "Agustín (Administrador)", rol: "supervisor" },
+            { id: 2, nombre: "Juan Parrilla", rol: "operativo" },
+            { id: 3, nombre: "Chef Carlos", rol: "supervisor" },
+            { id: 4, nombre: "María Servicio", rol: "operativo" }
+        ];
+
+        let fotosCargadasEnChecklistActual = 0;
+
         function initDB() {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
             request.onupgradeneeded = function(e) {
@@ -363,6 +408,7 @@
                 if (!db.objectStoreNames.contains("checklists")) { db.createObjectStore("checklists", { keyPath: "id", autoIncrement: true }); }
                 if (!db.objectStoreNames.contains("mermas")) { db.createObjectStore("mermas", { keyPath: "id", autoIncrement: true }); }
                 if (!db.objectStoreNames.contains("tareas_dinamicas")) { db.createObjectStore("tareas_dinamicas", { keyPath: "id", autoIncrement: true }); }
+                if (!db.objectStoreNames.contains("colaboradores")) { db.createObjectStore("colaboradores", { keyPath: "id", autoIncrement: true }); }
             };
             request.onsuccess = function(e) {
                 db = e.target.result;
@@ -371,14 +417,12 @@
         }
 
         function sincronizarBase() {
-            const tx = db.transaction(["configuracion", "tareas_dinamicas"], "readwrite");
-            const configStore = tx.objectStore("configuracion");
-            const tareasStore = tx.objectStore("tareas_dinamicas");
-
-            configStore.get("ciclo_inicio").onsuccess = function(e) {
+            const tx = db.transaction(["configuracion", "tareas_dinamicas", "colaboradores"], "readwrite");
+            
+            tx.objectStore("configuracion").get("ciclo_inicio").onsuccess = function(e) {
                 if (!e.target.result) {
                     const hoy = new Date().toISOString().split('T')[0];
-                    configStore.put({ id: "ciclo_inicio", fecha: hoy });
+                    tx.objectStore("configuracion").put({ id: "ciclo_inicio", fecha: hoy });
                     document.getElementById("cycle-start-date").innerText = hoy;
                 } else {
                     document.getElementById("cycle-start-date").innerText = e.target.result.fecha;
@@ -386,14 +430,19 @@
                 }
             };
 
-            configStore.get("areas_lista").onsuccess = function(e) {
-                if (!e.target.result) { configStore.put({ id: "areas_lista", datos: areasCatalogo }); }
+            tx.objectStore("configuracion").get("areas_lista").onsuccess = function(e) {
+                if (!e.target.result) { tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }); }
                 else { areasCatalogo = e.target.result.datos; }
                 inicializarCombosUI();
             };
 
-            tareasStore.count().onsuccess = function(e) {
-                if (e.target.result === 0) { TAREAS_SEMILLA.forEach(t => tareasStore.add(t)); }
+            tx.objectStore("tareas_dinamicas").count().onsuccess = function(e) {
+                if (e.target.result === 0) { TAREAS_SEMILLA.forEach(t => tx.objectStore("tareas_dinamicas").add(t)); }
+            };
+
+            tx.objectStore("colaboradores").count().onsuccess = function(e) {
+                if (e.target.result === 0) { colaboradoresCatalogo.forEach(c => tx.objectStore("colaboradores").add(c)); }
+                actualizarCombosPersonal();
             };
         }
 
@@ -408,7 +457,7 @@
             }
         }
 
-        // --- MANEJO DE MODALES DE CONFIRMACIÓN ---
+        // --- INTERFAZ GLOBAL MODAL DE CONFIRMACIÓN ---
         function mostrarVentanaConfirmar(title, msg, icon, callback) {
             document.getElementById("confirm-title").innerText = title;
             document.getElementById("confirm-message").innerText = msg;
@@ -424,18 +473,18 @@
         }
 
         function solicitarConfirmacionOperativo() {
-            const empleado = document.getElementById("op-empleado").value.trim();
-            if (!empleado) return alert("Ingrese el nombre del operativo a cargo.");
+            const empleado = document.getElementById("op-empleado").value;
+            if (!empleado) return alert("Debe dar de alta y seleccionar un empleado operativo.");
             
             mostrarVentanaConfirmar(
                 "¿Confirmar envío del Formato?",
-                `Hola ${empleado}, se enviarán todas tus respuestas del turno a revisión del supervisor. ¿Deseas continuar?`,
+                `Se enviarán las respuestas de verificación a revisión de supervisión. ¿Deseas continuar?`,
                 "📋",
                 ejecutarGuardadoOperativo
             );
         }
 
-        // --- SEGURIDAD: PIN ACCESO ---
+        // --- SEGURIDAD PIN ---
         function switchTab(tabId) {
             if (tabId === "tab-admin" && !pinAutenticado) {
                 document.getElementById("pin-modal").classList.remove("hidden");
@@ -452,7 +501,7 @@
                 document.getElementById("pin-input").value = "";
                 ejecutarCambioTab("tab-admin");
             } else {
-                alert("PIN incorrecto. Modificaciones denegadas.");
+                alert("PIN de administrador incorrecto.");
                 document.getElementById("pin-input").value = "";
             }
         }
@@ -476,11 +525,12 @@
             if (tabId === 'tab-finanzas') renderizarMermas();
         }
 
+        // --- ACTUALIZACIONES COMBOS DINÁMICOS ---
         function inicializarCombosUI() {
             const selectOp = document.getElementById("op-area");
-            const selectCrud = document.getElementById("crud-area");
+            const selectCrudTarea = document.getElementById("crud-area-area");
             selectOp.innerHTML = "";
-            selectCrud.innerHTML = "";
+            selectCrudTarea.innerHTML = "";
 
             areasCatalogo.forEach(a => {
                 let opt1 = document.createElement("option");
@@ -489,12 +539,36 @@
 
                 let opt2 = document.createElement("option");
                 opt2.value = a.id; opt2.innerText = a.nombre;
-                selectCrud.appendChild(opt2);
+                selectCrudTarea.appendChild(opt2);
             });
             actualizarTareasUI();
         }
 
-        // --- FLUJO CAPTURA CHECKLIST ---
+        function actualizarCombosPersonal() {
+            const selectOpEmp = document.getElementById("op-empleado");
+            const selectSup = document.getElementById("supervisor-signature");
+            selectOpEmp.innerHTML = "";
+            selectSup.innerHTML = "";
+
+            const tx = db.transaction(["colaboradores"], "readonly");
+            tx.objectStore("colaboradores").openCursor().onsuccess = function(e) {
+                const cursor = e.target.result;
+                if (cursor) {
+                    let opt = document.createElement("option");
+                    opt.value = cursor.value.nombre;
+                    opt.innerText = cursor.value.nombre;
+
+                    if (cursor.value.rol === "operativo") {
+                        selectOpEmp.appendChild(opt);
+                    } else {
+                        selectSup.appendChild(opt);
+                    }
+                    cursor.continue();
+                }
+            };
+        }
+
+        // --- FLUJO OPERATIVO ---
         function actualizarTareasUI() {
             const areaSel = document.getElementById("op-area").value;
             const turnoSel = document.getElementById("op-turno").value;
@@ -535,17 +609,16 @@
                             <div id="block-violacion-${t.id}" class="hidden bg-rose-50/50 p-4 rounded-lg border border-rose-100 space-y-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-[10px] font-bold text-rose-700 uppercase mb-1">Descripción de Violación *</label>
-                                        <input type="text" id="input-violacion-${t.id}" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none" placeholder="Falla detectada...">
+                                        <label class="block text-[10px] font-bold text-rose-700 uppercase mb-1">Causa de Violación *</label>
+                                        <input type="text" id="input-violacion-${t.id}" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none">
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Acción Correctiva (Qué hacer) *</label>
-                                        <input type="text" id="input-correccion-${t.id}" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none" placeholder="Corrección aplicada...">
+                                        <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Acción de Corrección Inmediata *</label>
+                                        <input type="text" id="input-correccion-${t.id}" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none">
                                     </div>
                                 </div>
                                 ${requiereFoto ? `
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cargar Foto de Evidencia</label>
                                     <input type="file" accept="image/*" id="foto-${t.id}" onchange="procesarFotoBase64(${t.id})" class="text-xs text-slate-500">
                                     <input type="hidden" id="hidden-b64-${t.id}">
                                 </div>` : ''}
@@ -559,13 +632,12 @@
 
         function toggleCamposViolacion(id, mostrar) {
             const div = document.getElementById(`block-violacion-${id}`);
-            if (mostrar) { div.classList.remove("hidden"); }
+            if (mostrar) div.classList.remove("hidden");
             else {
                 div.classList.add("hidden");
                 const hid = document.getElementById(`hidden-b64-${id}`);
                 if (hid && hid.value) {
-                    hid.value = "";
-                    fotosCargadasEnChecklistActual = Math.max(0, fotosCargadasEnChecklistActual - 1);
+                    hid.value = ""; fotosCargadasEnChecklistActual = Math.max(0, fotosCargadasEnChecklistActual - 1);
                     actualizarContadorFotosUI();
                 }
             }
@@ -574,7 +646,7 @@
         function procesarFotoBase64(id) {
             const fileInput = document.getElementById(`foto-${id}`);
             if (fotosCargadasEnChecklistActual >= 3) {
-                alert("Límite estratégico: Máximo 3 fotos por lista.");
+                alert("Límite estratégico: Máximo 3 fotos globales por formato.");
                 fileInput.value = ""; return;
             }
             const file = fileInput.files[0];
@@ -582,8 +654,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById(`hidden-b64-${id}`).value = e.target.result;
-                    fotosCargadasEnChecklistActual++;
-                    actualizarContadorFotosUI();
+                    fotosCargadasEnChecklistActual++; actualizarContadorFotosUI();
                 };
                 reader.readAsDataURL(file);
             }
@@ -595,7 +666,7 @@
         }
 
         function ejecutarGuardadoOperativo() {
-            const empleado = document.getElementById("op-empleado").value.trim();
+            const empleado = document.getElementById("op-empleado").value;
             const areaSel = document.getElementById("op-area").value;
             const turnoSel = document.getElementById("op-turno").value;
             const tipoSel = document.getElementById("op-tipo").value;
@@ -625,7 +696,7 @@
                     }
                     cursor.continue();
                 } else {
-                    if (!validacionCorrecta) return alert("Error: Si reporta una violación, debe completar obligatoriamente la causa y su acción correctiva.");
+                    if (!validacionCorrecta) return alert("Error: Complete la descripción de la falla y su corrección.");
 
                     const nuevoFormato = {
                         fecha: new Date().toISOString().split('T')[0],
@@ -641,15 +712,14 @@
 
                     const txSave = db.transaction(["checklists"], "readwrite");
                     txSave.objectStore("checklists").add(nuevoFormato).onsuccess = function() {
-                        alert("✅ Formato guardado de forma segura y enviado a supervisión.");
-                        document.getElementById("op-empleado").value = "";
+                        alert("✅ Formato registrado. Informa a tu supervisor en turno.");
                         actualizarTareasUI();
                     };
                 }
             };
         }
 
-        // --- PANEL DE SUPERVISOR CON CONFIRMACIÓN ---
+        // --- PANEL SUPERVISION ---
         function renderizarSupervisor() {
             const divPendientes = document.getElementById("lista-pendientes");
             const tablaHistorial = document.getElementById("tabla-historial");
@@ -700,12 +770,12 @@
         }
 
         function solicitarConfirmacionSupervisor(id) {
-            const supervisor = document.getElementById("supervisor-signature").value.trim();
-            if (!supervisor) return alert("Debe estipular el nombre del supervisor al inicio del panel antes de firmar.");
+            const supervisor = document.getElementById("supervisor-signature").value;
+            if (!supervisor) return alert("Debe seleccionar un supervisor en la parte superior antes de autorizar.");
             
             mostrarVentanaConfirmar(
                 "¿Autorizar Cierre de Formato?",
-                `Estimado ${supervisor}, ¿estás de acuerdo con cerrar este reporte y archivarlo en la auditoría semanal?`,
+                `Estimado ${supervisor}, ¿estás de acuerdo con archivar este reporte en la auditoría semanal?`,
                 "🛡️",
                 () => ejecutarAutorizacionSupervisor(id, supervisor)
             );
@@ -718,67 +788,130 @@
                 let data = e.target.result;
                 data.estado = "aprobado";
                 data.supervisor = supervisor;
-                store.put(data).onsuccess = function() {
-                    renderizarSupervisor();
-                };
+                store.put(data).onsuccess = function() { renderizarSupervisor(); };
             };
         }
 
-        // --- CRUD DE ÁREAS OPERATIVAS (AJUSTABLE POR EL CLIENTE) ---
-        function guardarAreaOperativa() {
-            const nombre = document.getElementById("crud-area-nombre").value.trim();
-            if (!nombre) return alert("Escribe el nombre del área.");
-            const requiereFoto = document.getElementById("crud-area-foto").checked;
-            const idxStr = document.getElementById("crud-area-idx").value;
+        // --- BLOQUE 2 ADMIN: CRUD PLANTILLA COLABORADORES ---
+        function guardarColaborador() {
+            const nombre = document.getElementById("crud-user-nombre").value.trim();
+            const rol = document.getElementById("crud-user-rol").value;
+            const userId = document.getElementById("crud-user-id").value;
 
-            if (idxStr !== "") {
-                // Editar Área
-                const index = parseInt(idxStr);
-                areasCatalogo[index].nombre = nombre;
-                areasCatalogo[index].requiereFoto = requiereFoto;
+            if (!nombre) return alert("Escriba el nombre completo del colaborador.");
+
+            const tx = db.transaction(["colaboradores"], "readwrite");
+            const store = tx.objectStore("colaboradores");
+
+            if (userId) {
+                store.put({ id: parseInt(userId), nombre, rol }).onsuccess = terminar;
             } else {
-                // Nueva Área
-                const idGenerado = nombre.toLowerCase().replace(/[^a-z0-9]/g, "_");
-                if (areasCatalogo.some(a => a.id === idGenerado)) return alert("Ese nombre de área ya existe.");
-                areasCatalogo.push({ id: idGenerado, nombre, requiereFoto });
+                store.add({ nombre, rol }).onsuccess = terminar;
+            }
+
+            function terminar() {
+                document.getElementById("crud-user-nombre").value = "";
+                document.getElementById("crud-user-id").value = "";
+                renderizarTablaUsuarios();
+                actualizarCombosPersonal();
+            }
+        }
+
+        function renderizarTablaUsuarios() {
+            const tbody = document.getElementById("crud-tabla-usuarios");
+            tbody.innerHTML = "";
+            const tx = db.transaction(["colaboradores"], "readonly");
+            tx.objectStore("colaboradores").openCursor().onsuccess = function(e) {
+                const cursor = e.target.result;
+                if (cursor) {
+                    let tr = document.createElement("tr");
+                    tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="p-3 font-semibold text-slate-800">${cursor.value.nombre}</td>
+                        <td class="p-3 capitalize text-slate-500 font-medium">${cursor.value.rol}</td>
+                        <td class="p-3 text-center flex gap-1 justify-center">
+                            <button onclick="cargarEditarUsuario(${cursor.value.id}, '${cursor.value.nombre}', '${cursor.value.rol}')" class="bg-slate-200 text-slate-800 px-2 py-1 rounded text-[11px] font-bold">Editar</button>
+                            <button onclick="eliminarUsuario(${cursor.value.id})" class="bg-rose-600 text-white px-2 py-1 rounded text-[11px] font-bold">Borrar</button>
+                        </td>`;
+                    tbody.appendChild(tr);
+                    cursor.continue();
+                }
+            };
+        }
+
+        function cargarEditarUsuario(id, nombre, rol) {
+            document.getElementById("crud-user-id").value = id;
+            document.getElementById("crud-user-nombre").value = nombre;
+            document.getElementById("crud-user-rol").value = rol;
+        }
+
+        function eliminarUsuario(id) {
+            if (!confirm("¿Desea dar de baja a este colaborador?")) return;
+            const tx = db.transaction(["colaboradores"], "readwrite");
+            tx.objectStore("colaboradores").delete(id).onsuccess = function() {
+                renderizarTablaUsuarios(); actualizarCombosPersonal();
+            };
+        }
+
+
+        // --- BLOQUE 3 ADMIN: CRUD REAL DE ÁREAS OPERATIVAS ---
+        function guardarAreaOperativa() {
+            const nombreInput = document.getElementById("crud-area-nombre").value.trim();
+            if (!nombreInput) return alert("Escriba el nombre comercial del área.");
+            const requiereFoto = document.getElementById("crud-area-foto").checked;
+            const areaIdHidden = document.getElementById("crud-area-id-hidden").value;
+
+            if (areaIdHidden) {
+                // MODO EDICIÓN DIRECTA: Mapeamos el índice y editamos el objeto real
+                const idx = areasCatalogo.findIndex(a => a.id === areaIdHidden);
+                if (idx !== -1) {
+                    areasCatalogo[idx].nombre = nombreInput;
+                    areasCatalogo[idx].requiereFoto = requiereFoto;
+                }
+            } else {
+                // MODO NUEVA ÁREA
+                const idGenerado = nombreInput.toLowerCase().replace(/[^a-z0-9]/g, "_");
+                if (areasCatalogo.some(a => a.id === idGenerado)) return alert("Ese identificador ya existe.");
+                areasCatalogo.push({ id: idGenerado, nombre: nombreInput, requiereFoto: requiereFoto });
             }
 
             const tx = db.transaction(["configuracion"], "readwrite");
             tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }).onsuccess = function() {
-                alert("Área operativa guardada.");
+                alert("Área operativa actualizada con éxito.");
                 limpiarFormArea();
                 renderizarAdminConfig();
                 inicializarCombosUI();
             };
         }
 
-        function eliminarAreaOperativa(index) {
-            if (!confirm(`¿Estás seguro de eliminar el área "${areasCatalogo[index].nombre}"? Se perderán sus filtros del catálogo.`)) return;
-            areasCatalogo.splice(index, 1);
+        function cargarEditarArea(idStr, nombreStr, fotoBool) {
+            document.getElementById("crud-area-id-hidden").value = idStr;
+            document.getElementById("crud-area-nombre").value = nombreStr;
+            document.getElementById("crud-area-foto").checked = (fotoBool === 'true');
+        }
+
+        function eliminarAreaOperativa(idStr) {
+            if (!confirm("¿Desea eliminar esta área? Se removerán sus accesos y filtros operacionales.")) return;
+            areasCatalogo = areasCatalogo.filter(a => a.id !== idStr);
+            
             const tx = db.transaction(["configuracion"], "readwrite");
             tx.objectStore("configuracion").put({ id: "areas_lista", datos: areasCatalogo }).onsuccess = function() {
-                renderizarAdminConfig();
-                inicializarCombosUI();
+                limpiarFormArea(); renderizarAdminConfig(); inicializarCombosUI();
             };
         }
 
-        function cargarEditarArea(index) {
-            document.getElementById("crud-area-idx").value = index;
-            document.getElementById("crud-area-nombre").value = areasCatalogo[index].nombre;
-            document.getElementById("crud-area-foto").checked = areasCatalogo[index].requiereFoto;
-        }
-
         function limpiarFormArea() {
-            document.getElementById("crud-area-idx").value = "";
+            document.getElementById("crud-area-id-hidden").value = "";
             document.getElementById("crud-area-nombre").value = "";
             document.getElementById("crud-area-foto").checked = false;
         }
 
-        // --- CRUD ORDENADO DE TAREAS Y FILTROS ---
+
+        // --- BLOQUE 4 ADMIN: CRUD DE TAREAS OPERATIVAS ---
         function filtrarCrudTareas() {
-            const area = document.getElementById("crud-area").value;
-            const turno = document.getElementById("crud-turno").value;
-            const tipo = document.getElementById("crud-tipo").value;
+            const area = document.getElementById("crud-tarea-area").value;
+            const turno = document.getElementById("crud-tarea-turno").value;
+            const tipo = document.getElementById("crud-tarea-tipo").value;
             const tbody = document.getElementById("crud-tabla-tareas");
             tbody.innerHTML = "";
 
@@ -817,9 +950,9 @@
             if (!desc) return alert("Escribe la descripción de la consigna.");
 
             const id = document.getElementById("crud-edit-id").value;
-            const area = document.getElementById("crud-area").value;
-            const turno = document.getElementById("crud-turno").value;
-            const tipo = document.getElementById("crud-tipo").value;
+            const area = document.getElementById("crud-tarea-area").value;
+            const turno = document.getElementById("crud-tarea-turno").value;
+            const tipo = document.getElementById("crud-tarea-tipo").value;
 
             const tx = db.transaction(["tareas_dinamicas"], "readwrite");
             const store = tx.objectStore("tareas_dinamicas");
@@ -851,24 +984,38 @@
             };
         }
 
+
+        // --- RENDERS DE INTERFAZ GENERAL ---
         function renderizarAdminConfig() {
             document.getElementById("cfg-restaurante").value = localStorage.getItem("restaurante_nombre") || "Tacos y Montados FI-FÍ";
             document.getElementById("cfg-sucursal").value = localStorage.getItem("restaurante_sucursal") || "Matriz LocalStore";
 
-            // Listar tabla CRUD de Áreas
+            // Renderizar Bloque 2: Plantilla
+            renderizarTablaUsuarios();
+
+            // Renderizar Bloque 3: Tabla Áreas
             const tbodyAreas = document.getElementById("crud-tabla-areas");
             tbodyAreas.innerHTML = "";
-            areasCatalogo.forEach((a, index) => {
+            areasCatalogo.forEach((a) => {
                 let tr = document.createElement("tr");
                 tr.className = "border-b border-slate-100 hover:bg-slate-50";
                 tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-slate-400 text-xs">${a.id}</td>
                     <td class="p-3 font-semibold text-slate-800">${a.nombre}</td>
                     <td class="p-3 font-medium ${a.requiereFoto ? 'text-amber-600' : 'text-slate-400'}">${a.requiereFoto ? '📸 Activa' : 'Desactivada'}</td>
                     <td class="p-3 text-center flex gap-1 justify-center">
-                        <button onclick="cargarEditarArea(${index})" class="bg-slate-200 text-slate-800 px-2 py-1 rounded text-[11px] font-bold">Editar</button>
-                        <button onclick="eliminarAreaOperativa(${index})" class="bg-rose-600 text-white px-2 py-1 rounded text-[11px] font-bold">Borrar</button>
+                        <button onclick="cargarEditarArea('${a.id}', '${a.nombre}', '${a.requiereFoto}')" class="bg-slate-200 text-slate-800 px-2 py-1 rounded text-[11px] font-bold">Editar</button>
+                        <button onclick="eliminarAreaOperativa('${a.id}')" class="bg-rose-600 text-white px-2 py-1 rounded text-[11px] font-bold">Borrar</button>
                     </td>`;
                 tbodyAreas.appendChild(tr);
+            });
+
+            // Sincronizar el select del CRUD de tareas con las áreas del catálogo
+            const selectCrudTarea = document.getElementById("crud-tarea-area");
+            selectCrudTarea.innerHTML = "";
+            areasCatalogo.forEach(a => {
+                let opt = document.createElement("option"); opt.value = a.id; opt.innerText = a.nombre;
+                selectCrudTarea.appendChild(opt);
             });
 
             filtrarCrudTareas();
@@ -894,7 +1041,7 @@
                     const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
                     const a = document.createElement('a');
                     a.setAttribute("href", str);
-                    a.setAttribute("download", `PRO26_AUDITORIA_AGUSTIN_${new Date().toISOString().split('T')[0]}.json`);
+                    a.setAttribute("download", `PRO26_AUDITORIA_${new Date().toISOString().split('T')[0]}.json`);
                     document.body.appendChild(a); a.click(); a.remove();
                     ejecutarLimpiezaCiclo();
                 }
@@ -906,7 +1053,7 @@
             tx.objectStore("checklists").clear();
             const hoy = new Date().toISOString().split('T')[0];
             tx.objectStore("configuracion").put({ id: "ciclo_inicio", fecha: hoy }).onsuccess = function() {
-                alert("🚨 Base limpia para el inicio del nuevo ciclo.");
+                alert("🚨 El sistema se ha reiniciado correctamente para la nueva semana.");
                 location.reload();
             };
         }
@@ -944,7 +1091,7 @@
                 if (cursor) {
                     let li = document.createElement("li");
                     li.className = "bg-slate-50 p-2.5 rounded-lg border-l-4 border-rose-500 font-medium text-slate-700 flex justify-between";
-                    li.innerHTML = `<span>📅 ${cursor.value.fecha} — <b>${cursor.value.insumo}</b> (${cursor.value.motivo})</span> <span class="text-rose-600">-$${cursor.value.costo}</span>`;
+                    li.innerHTML = `<span>📅 ${cursor.value.fecha} — <b>${cursor.value.insumo}</b> (${cursor.value.motivo})</span> <span class="text-rose-600 text-right">-$${cursor.value.costo}</span>`;
                     lista.appendChild(li); cursor.continue();
                 }
             };
