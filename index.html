@@ -14,7 +14,7 @@
 <body class="min-h-screen flex flex-col font-sans">
 
     <div id="weekly-lock-banner" class="hidden bg-slate-900 text-white p-4 text-center text-sm font-medium sticky top-0 z-50 border-b border-rose-500/30 shadow-sm">
-        <span>⚠️ Ciclo semanal concluido. Capturas pauses hasta descargar el respaldo de auditoría.</span>
+        <span>⚠️ Ciclo semanal concluido. Capturas pausadas hasta descargar el respaldo de auditoría.</span>
         <button onclick="downloadPDFAndReset()" class="ml-4 bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded transition font-bold tracking-wide uppercase">Descargar y Reiniciar</button>
     </div>
 
@@ -153,7 +153,7 @@
             <div class="bg-slate-900 text-slate-200 p-5 rounded-xl space-y-2 border border-slate-800 shadow-inner">
                 <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">💡 Instrucción de Control de Mermas</h3>
                 <p class="text-xs leading-relaxed text-slate-300">
-                    Las mermas representan pérdidas directas sobre tu Utilidad Bruta. Para asegurar análisis financieros correctos basados en estrategias de <b>Mark In / Margen Objetivo</b>, registra todo insumo desechado o excedente. Detalla causas exactas para ajustar costos brutos.
+                    Las mermas representan pérdidas directas sobre tu Utilidad Bruta. Registra todo insumo desechado basándote en su costo unitario o por onza y detalla causas exactas para ajustar costos brutos.
                 </p>
             </div>
 
@@ -280,26 +280,26 @@
                 <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">📍 4. Criterios y Tareas de Verificación</h2>
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Área</label>
-                        <select id="crud-tarea-area" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none"></select>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Filtro: Área de Trabajo</label>
+                        <select id="crud-area-area" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none" onchange="filtrarCrudTareas()"></select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Turno</label>
-                        <select id="crud-tarea-turno" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Filtro: Turno</label>
+                        <select id="crud-tarea-turno" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none" onchange="filtrarCrudTareas()">
                             <option value="matutino">Matutino</option>
                             <option value="vespertino">Vespertino</option>
                             <option value="nocturno">Nocturno</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Formato</label>
-                        <select id="crud-tarea-tipo" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none">
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">Filtro: Formato</label>
+                        <select id="crud-tarea-tipo" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none" onchange="filtrarCrudTareas()">
                             <option value="apertura">Apertura</option>
                             <option value="cierre">Cierre</option>
                             <option value="express">Express</option>
                         </select>
                     </div>
-                    <button onclick="filtrarCrudTareas()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 text-xs font-bold rounded-lg transition">Filtrar Catálogo</button>
+                    <button onclick="filtrarCrudTareas()" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 text-xs font-bold rounded-lg transition">🔄 Forzar Filtro</button>
                 </div>
 
                 <div class="space-y-2 border-t border-slate-100 pt-3">
@@ -335,7 +335,7 @@
 
     <script>
         let db;
-        const DB_NAME = "PRO26_FINAL_ESTABLE_DB";
+        const DB_NAME = "PRO26_FINAL_ESTABLE_DB_V3";
         const DB_VERSION = 1;
         let pinAutenticado = false;
         let callbackConfirmacion = null;
@@ -516,6 +516,9 @@
         function inicializarCombosUI() {
             const selectOp = document.getElementById("op-area");
             const selectCrudTarea = document.getElementById("crud-area-area");
+            
+            if(!selectOp || !selectCrudTarea) return;
+            
             selectOp.innerHTML = "";
             selectCrudTarea.innerHTML = "";
 
@@ -551,6 +554,7 @@
             const turnoSel = document.getElementById("op-turno").value;
             const tipoSel = document.getElementById("op-tipo").value;
             const contenedor = document.getElementById("tareas-container");
+            if(!contenedor) return;
             contenedor.innerHTML = "";
 
             const configArea = areasCatalogo.find(a => a.id === areaSel);
@@ -603,8 +607,10 @@
 
         function toggleCamposViolacion(id, mostrar) {
             const div = document.getElementById(`block-violacion-${id}`);
-            if (mostrar) div.classList.remove("hidden");
-            else div.classList.add("hidden");
+            if (div) {
+                if (mostrar) div.classList.remove("hidden");
+                else div.classList.add("hidden");
+            }
         }
 
         function procesarFotoBase64(id) {
@@ -666,7 +672,6 @@
             };
         }
 
-        // --- PANEL SUPERVISOR ---
         function renderizarSupervisor() {
             const divPendientes = document.getElementById("lista-pendientes");
             const tablaHistorial = document.getElementById("tabla-historial");
@@ -728,7 +733,6 @@
             };
         }
 
-        // --- CRUD COLABORADORES ---
         function guardarColaborador() {
             const nombre = document.getElementById("crud-user-nombre").value.trim();
             const rol = document.getElementById("crud-user-rol").value;
@@ -773,7 +777,6 @@
             document.getElementById("crud-user-nombre").value = "";
         }
 
-        // --- CRUD AREAS ---
         function guardarAreaOperativa() {
             const nombreInput = document.getElementById("crud-area-nombre").value.trim();
             if (!nombreInput) return alert("Escriba el nombre.");
@@ -816,12 +819,13 @@
             document.getElementById("crud-area-foto").checked = false;
         }
 
-        // --- CRUD TAREAS OPERATIVAS (CORREGIDO DE RAÍZ) ---
+        // --- SISTEMA CRUD DE TAREAS OPERATIVAS (LOGICA SANA DE FILTRADO) ---
         function filtrarCrudTareas() {
-            const area = document.getElementById("crud-tarea-area").value;
+            const area = document.getElementById("crud-area-area").value;
             const turno = document.getElementById("crud-tarea-turno").value;
             const tipo = document.getElementById("crud-tarea-tipo").value;
             const tbody = document.getElementById("crud-tabla-tareas");
+            if(!tbody) return;
             tbody.innerHTML = "";
 
             const tx = db.transaction(["tareas_dinamicas"], "readonly");
@@ -829,11 +833,10 @@
                 const cursor = e.target.result;
                 if (cursor) {
                     const t = cursor.value;
-                    // Corrección lógica: Validamos estricto correspondencia de filtros
                     if (t.area === area && t.turnos.includes(turno) && t.tipos.includes(tipo)) {
                         let tr = document.createElement("tr"); tr.className = "border-b border-slate-100 text-slate-700 hover:bg-slate-50";
                         tr.innerHTML = `
-                            <td class="p-3 font-medium">${t.desc}</td>
+                            <td class="p-3 font-medium text-xs sm:text-sm">${t.desc}</td>
                             <td class="p-3 text-center flex gap-1 justify-center">
                                 <button onclick="cargarEditarTarea(${t.id}, '${t.desc.replace(/'/g, "\\'")}')" class="bg-slate-200 text-slate-800 px-2.5 py-1 rounded-md text-[11px] font-bold">Editar</button>
                                 <button onclick="eliminarTareaCrud(${t.id})" class="bg-rose-600 text-white px-2.5 py-1 rounded-md text-[11px] font-bold">Eliminar</button>
@@ -842,7 +845,7 @@
                     }
                     cursor.continue();
                 } else if (tbody.innerHTML === "") {
-                    tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-slate-400 italic">No hay consignas asignadas para este filtro.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-slate-400 italic">No hay criterios asignados para este filtro. Puedes crear uno nuevo abajo.</td></tr>`;
                 }
             };
         }
@@ -881,6 +884,7 @@
             document.getElementById("crud-desc-input").value = "";
         }
 
+        // --- RENDERIZADO ADMINISTRACIÓN ---
         function renderizarAdminConfig() {
             localStorage.setItem("restaurante_nombre", localStorage.getItem("restaurante_nombre") || "Tacos y Montados FI-FÍ");
             localStorage.setItem("restaurante_sucursal", localStorage.getItem("restaurante_sucursal") || "Matriz LocalStore");
@@ -896,11 +900,18 @@
                 tbodyAreas.appendChild(tr);
             });
 
-            const selectCrudTarea = document.getElementById("crud-area-area"); selectCrudTarea.innerHTML = "";
-            areasCatalogo.forEach(a => {
-                let opt = document.createElement("option"); opt.value = a.id; opt.innerText = a.nombre;
-                selectCrudTarea.appendChild(opt);
-            });
+            const selectCrudTarea = document.getElementById("crud-area-area"); 
+            if (selectCrudTarea) {
+                const valorPrevio = selectCrudTarea.value;
+                selectCrudTarea.innerHTML = "";
+                areasCatalogo.forEach(a => {
+                    let opt = document.createElement("option"); opt.value = a.id; opt.innerText = a.nombre;
+                    selectCrudTarea.appendChild(opt);
+                });
+                if(valorPrevio && areasCatalogo.some(a => a.id === valorPrevio)) {
+                    selectCrudTarea.value = valorPrevio;
+                }
+            }
             filtrarCrudTareas();
         }
 
@@ -955,7 +966,8 @@
         }
 
         function renderizarMermas() {
-            const lista = document.getElementById("lista-mermas"); lista.innerHTML = "";
+            const lista = document.getElementById("lista-mermas"); if(!lista) return;
+            lista.innerHTML = "";
             const tx = db.transaction(["mermas"], "readonly");
             tx.objectStore("mermas").openCursor().onsuccess = function(e) {
                 let cursor = e.target.result;
